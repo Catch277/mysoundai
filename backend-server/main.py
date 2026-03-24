@@ -1,6 +1,8 @@
+import asyncio
 from fastapi import FastAPI
 from pydantic import BaseModel
 from typing import List
+
 
 # Khởi tạo ứng dụng FastAPI
 app = FastAPI(
@@ -23,7 +25,9 @@ def health_check():
     return {"status": "ok", "message": "MySoundAI API đang hoạt động!"}
 
 @app.get("/recommendations", response_model=List[Song])
-def get_recommendations(prompt: str = "tâm trạng vui vẻ"):
+async def get_recommendations(prompt: str = "tâm trạng vui vẻ"):
+    await asyncio.sleep(2)
+
     return [
         {
             "id": 1,

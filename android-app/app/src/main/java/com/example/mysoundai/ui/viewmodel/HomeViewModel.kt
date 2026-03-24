@@ -5,9 +5,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.mysoundai.di.NetworkModule
 import com.example.mysoundai.domain.model.Song
+import com.example.mysoundai.domain.repository.MusicRepository
 import kotlinx.coroutines.launch
 
-class HomeViewModel : ViewModel() {
+class HomeViewModel(
+    private val musicRepository: MusicRepository
+) : ViewModel() {
     var songList = mutableStateOf<List<Song>>(emptyList())
     var isLoading = mutableStateOf(false)
     init {
@@ -18,7 +21,7 @@ class HomeViewModel : ViewModel() {
         viewModelScope.launch {
             isLoading.value = true
             try {
-                val response = NetworkModule.apiService.getRecomendations()
+                val response = musicRepository.getTrendingSongs()
                 songList.value = response
             } catch (e: Exception) {
                 e.printStackTrace()
