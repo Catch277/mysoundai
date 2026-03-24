@@ -11,6 +11,8 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import com.example.mysoundai.ui.components.SongItem
+
 @Composable
 fun HomeScreen(viewModel: HomeViewModel) {
     val songs = viewModel.songList.value
@@ -28,7 +30,7 @@ fun HomeScreen(viewModel: HomeViewModel) {
                     )
                 }
                 items(songs) { song ->
-                    Text(text = "${song.title} - ${song.artist}")
+                    SongItem(song = song)
                 }
             }
         }

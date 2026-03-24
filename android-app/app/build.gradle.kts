@@ -39,6 +39,8 @@ android {
 }
 
 dependencies {
+    implementation("androidx.palette:palette-ktx:1.0.0")
+    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation("androidx.lifecycle:lifecycle-viewmodel-compose:2.10.0")
     val room_version = "2.8.4"
     implementation("androidx.room:room-runtime:$room_version")
