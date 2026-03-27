@@ -8,10 +8,10 @@
             <InsightsFilterSettings>
               <option name="connection">
                 <ConnectionSetting>
-                  <option name="appId" value="PLACEHOLDER" />
-                  <option name="mobileSdkAppId" value="" />
-                  <option name="projectId" value="" />
-                  <option name="projectNumber" value="" />
+                  <option name="appId" value="com.example.mysoundai" />
+                  <option name="mobileSdkAppId" value="1:1040836301216:android:7c5f243de642efe6f114c5" />
+                  <option name="projectId" value="mysoundai-285bc" />
+                  <option name="projectNumber" value="1040836301216" />
                 </ConnectionSetting>
               </option>
               <option name="signal" value="SIGNAL_UNSPECIFIED" />
