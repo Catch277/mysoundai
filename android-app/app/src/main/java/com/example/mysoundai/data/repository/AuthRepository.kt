@@ -5,6 +5,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import com.example.mysoundai.data.model.UserData
+import kotlinx.coroutines.tasks.await
 
 class AuthRepository(private val auth: FirebaseAuth) {
     fun getCurrentUser(): UserData? {
@@ -29,5 +30,21 @@ class AuthRepository(private val auth: FirebaseAuth) {
 
     fun signOut() {
         auth.signOut()
+    }
+
+    suspend fun signUpWithEmail(email: String, password: String): Result<UserData?> {
+        return try {
+            val result = auth.createUserWithEmailAndPassword(email, password).await()
+            val userData = result.user?.let {
+                UserData(it.uid, it.displayName, it.photoUrl?.toString())
+            }
+            Result.success(userData)
+        } catch (e: Exception) {
+            Result.failure(e)
+        }
+    }
+
+    suspend fun signInWithGoogle(idToken: String): Result<UserData?> {
+        return Result.failure(Exception("Chưa cài đặt Google SDK"))
     }
 }

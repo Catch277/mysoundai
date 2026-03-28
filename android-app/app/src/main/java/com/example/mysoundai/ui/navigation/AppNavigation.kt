@@ -18,19 +18,15 @@ import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import com.example.mysoundai.ui.viewmodel.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.mysoundai.di.AppContainer
+import com.example.mysoundai.ui.screens.RegisterScreen
+
 @Composable
 fun AppNavigation(
     navController: NavHostController,
-    viewModel: HomeViewModel,
+    homeViewModel: HomeViewModel,
+    authViewModel: AuthViewModel,
     paddingValues: PaddingValues
 ) {
-    val authViewModel:  AuthViewModel = viewModel(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return AuthViewModel(AppContainer.authRepository) as T
-            }
-        }
-    )
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
@@ -39,13 +35,26 @@ fun AppNavigation(
         exitTransition = { fadeOut(animationSpec = tween(400)) }
     ) {
         composable(Screen.Home.route) {
-            HomeScreen(viewModel = viewModel, paddingValues = paddingValues)
+            HomeScreen(viewModel = homeViewModel, paddingValues = paddingValues)
         }
         composable(Screen.Search.route) { /* Khám phá */ }
         composable(Screen.Library.route) { /* Thư viện */ }
-        composable(Screen.Profile.route) { ProfileScreen(
-            authViewModel = authViewModel,
-            onSettingsClick = { /* Handle settings click */ }
-        ) }
+        composable(Screen.Profile.route) {
+            ProfileScreen(
+                authViewModel = authViewModel,
+                onSettingsClick = { /* Handle settings click */ },
+                        onRegisterClick = {
+                    navController.navigate(Screen.Register.route)
+                }
+            )
+        }
+        composable(Screen.Register.route) {
+            RegisterScreen(
+                authViewModel = authViewModel,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
     }
 }

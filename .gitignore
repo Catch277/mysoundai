@@ -1,0 +1,20 @@
+# ===== PYTHON / FASTAPI =====
+__pycache__/
+*.py[cod]
+.env
+.venv/
+venv/
+env/
+
+# ===== KOTLIN / ANDROID =====
+.gradle/
+build/
+local.properties
+.idea/
+*.iml
+captures/
+
+# ===== CHUNG =====
+.DS_Store
+Thumbs.db
+*.log

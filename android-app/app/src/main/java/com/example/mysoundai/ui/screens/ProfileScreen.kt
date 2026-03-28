@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Settings
@@ -25,10 +26,14 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import coil.compose.AsyncImage
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import com.example.mysoundai.data.model.UserData
 
@@ -36,9 +41,10 @@ import com.example.mysoundai.data.model.UserData
 @Composable
 fun ProfileScreen(
     authViewModel: AuthViewModel,
-    onSettingsClick: () -> Unit
+    onSettingsClick: () -> Unit,
+    onRegisterClick: () -> Unit
 ) {
-    val user by authViewModel.currentUser.collectAsState()
+    val user by authViewModel.currentUser.collectAsStateWithLifecycle()
 
     Column(
         modifier = Modifier.
@@ -71,7 +77,7 @@ fun ProfileScreen(
             UserInfoSection(user = user!!) { authViewModel.handleSignOut() }
         } else {
                 LoginOptionsSection(
-                    onLoginEmailClick = { /* Handle login with email */ },
+                    onLoginEmailClick = onRegisterClick,
                     onGoogleLoginClick = { /* Handle Google login */ },
                     onFacebookLoginClick = { /* Handle Facebook login */ }
                 )
@@ -125,12 +131,23 @@ fun UserInfoSection(user: UserData,
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Icon(
-            imageVector = Icons.Default.AccountCircle,
-            contentDescription = "Ảnh đại diện",
-            modifier = Modifier.size(100.dp),
-            tint = Color.Gray
-        )
+        if (user.profilePictureUrl != null)
+        {
+            AsyncImage(
+                model = user.profilePictureUrl,
+                contentDescription = "Ảnh đại diện",
+                modifier = Modifier.size(100.dp).clip(CircleShape),
+                contentScale = ContentScale.Crop
+            )
+        }
+        else {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = "Ảnh đại diện",
+                modifier = Modifier.size(100.dp),
+                tint = Color.Gray
+            )
+        }
         Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = user.userName ?: "Người dùng MySoundAI",
