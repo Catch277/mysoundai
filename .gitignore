@@ -17,4 +17,5 @@ captures/
 # ===== CHUNG =====
 .DS_Store
 Thumbs.db
-*.log
+*.loggoogle-services.json
+android-app/app/google-services.json
