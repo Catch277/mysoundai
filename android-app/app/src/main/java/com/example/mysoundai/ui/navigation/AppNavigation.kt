@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -16,8 +14,7 @@ import com.example.mysoundai.ui.screens.HomeScreen
 import com.example.mysoundai.ui.screens.ProfileScreen
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import com.example.mysoundai.ui.viewmodel.HomeViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.example.mysoundai.di.AppContainer
+import com.example.mysoundai.ui.screens.LoginScreen
 import com.example.mysoundai.ui.screens.RegisterScreen
 
 @Composable
@@ -45,6 +42,9 @@ fun AppNavigation(
                 onSettingsClick = { /* Handle settings click */ },
                         onRegisterClick = {
                     navController.navigate(Screen.Register.route)
+                },
+                onLoginClick = {
+                    navController.navigate(Screen.Login.route)
                 }
             )
         }
@@ -53,6 +53,18 @@ fun AppNavigation(
                 authViewModel = authViewModel,
                 onBack = {
                     navController.popBackStack()
+                }
+            )
+        }
+        composable(Screen.Login.route) {
+            LoginScreen(
+                authViewModel = authViewModel,
+                onBack = {
+                    navController.popBackStack() },
+                onNavigateToRegister = {
+                    navController.navigate(Screen.Register.route) {
+                        popUpTo(Screen.Login.route) { inclusive = true }
+                    }
                 }
             )
         }

@@ -42,7 +42,8 @@ import com.example.mysoundai.data.model.UserData
 fun ProfileScreen(
     authViewModel: AuthViewModel,
     onSettingsClick: () -> Unit,
-    onRegisterClick: () -> Unit
+    onRegisterClick: () -> Unit,
+    onLoginClick: () -> Unit
 ) {
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
 
@@ -77,7 +78,7 @@ fun ProfileScreen(
             UserInfoSection(user = user!!) { authViewModel.handleSignOut() }
         } else {
                 LoginOptionsSection(
-                    onLoginEmailClick = onRegisterClick,
+                    onLoginEmailClick = onLoginClick,
                     onGoogleLoginClick = { /* Handle Google login */ },
                     onFacebookLoginClick = { /* Handle Facebook login */ }
                 )
