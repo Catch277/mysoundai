@@ -186,29 +186,29 @@ fun SearchBarComponent(query:String,
 }
 
 
-@Composable
-fun SpotifyConnectButton(onConnectClick: () -> Unit) {
-    Button(
-        onClick = onConnectClick,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF1DB954)
-        ),
-        modifier = Modifier.padding(16.dp),
-        shape = androidx.compose.foundation.shape.RoundedCornerShape(25.dp)
-    ) {
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Icon(painter = painterResource(
-                id = R.drawable.ic_spotify),
-                contentDescription = null,
-                tint = Color.White)
-            Text(
-                text = "Kết nối Spotify",
-                style = MaterialTheme.typography.titleMedium,
-                color = Color.White
-            )
-        }
-    }
-}
+//@Composable
+//fun SpotifyConnectButton(onConnectClick: () -> Unit) {
+//    Button(
+//        onClick = onConnectClick,
+//        colors = ButtonDefaults.buttonColors(
+//            containerColor = Color(0xFF1DB954)
+//        ),
+//        modifier = Modifier.padding(16.dp),
+//        shape = androidx.compose.foundation.shape.RoundedCornerShape(25.dp)
+//    ) {
+//        Row(verticalAlignment = Alignment.CenterVertically) {
+//            Icon(painter = painterResource(
+//                id = R.drawable.ic_spotify),
+//                contentDescription = null,
+//                tint = Color.White)
+//            Text(
+//                text = "Kết nối Spotify",
+//                style = MaterialTheme.typography.titleMedium,
+//                color = Color.White
+//            )
+//        }
+//    }
+//}
 
 @Composable
 fun HomeHeader() {

@@ -14,6 +14,8 @@ sealed class Screen(val route: String, val title: String? = null, val icon: Imag
     object Profile: Screen("profile", "Cá nhân", Icons.Default.Person)
     object Register: Screen("register", "Đăng ký")
     object Login: Screen("login", "Đăng nhập")
+    object Settings: Screen("settings", "Cài đặt")
+    object UpdateProfile: Screen("updateProfile", "Cập nhật hồ sơ")
 }
 
 val bottomNavItems = listOf(

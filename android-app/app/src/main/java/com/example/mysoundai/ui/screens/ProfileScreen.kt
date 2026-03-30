@@ -1,6 +1,8 @@
 package com.example.mysoundai.ui.screens
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -49,40 +51,45 @@ fun ProfileScreen(
 
     Column(
         modifier = Modifier.
-        fillMaxSize().
-        padding(16.dp),
+        fillMaxSize()
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(Color.Black)
+                .padding(horizontal = 8.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = "Cá nhân",
-                style = MaterialTheme.typography.headlineMedium,
-                fontWeight = FontWeight.Bold,
-
-            )
-            IconButton(onClick = onSettingsClick) {
-                Icon(
-                    imageVector = Icons.Default.Settings,
-                    contentDescription = "Settings",
-
-                )
-            }
+                Text(
+                    text = "Cá nhân",
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                    )
+                IconButton(onClick = onSettingsClick) {
+                    Icon(
+                        imageVector = Icons.Default.Settings,
+                        contentDescription = "Settings",
+                        tint = Color.White
+                        )
+                }
         }
-        Spacer(modifier = Modifier.height(32.dp))
+
 
         // --- AUTH SECTION  ---
-        if (user != null) {
-            UserInfoSection(user = user!!) { authViewModel.handleSignOut() }
-        } else {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Spacer(modifier = Modifier.height(32.dp))
+            if (user != null) {
+                UserInfoSection(user = user!!) { authViewModel.handleSignOut() }
+            } else {
                 LoginOptionsSection(
                     onLoginEmailClick = onLoginClick,
                     onGoogleLoginClick = { /* Handle Google login */ },
                     onFacebookLoginClick = { /* Handle Facebook login */ }
                 )
             }
+        }
         }
    }
 @Composable
@@ -149,15 +156,18 @@ fun UserInfoSection(user: UserData,
                 tint = Color.Gray
             )
         }
-        Spacer(modifier = Modifier.height(16.dp))
+        Spacer(modifier = Modifier.height(24.dp))
         Text(
             text = user.userName ?: "Người dùng MySoundAI",
             style = MaterialTheme.typography.headlineSmall,
-            color = Color.White
         )
         Spacer(modifier = Modifier.height(24.dp))
-        TextButton(onClick = onSignOutClick) {
-            Text("Đăng xuất", color = Color.Red)
+        Button(onClick = onSignOutClick,
+            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1DB954))) {
+            Text("Đăng xuất",
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = Color.White)
         }
     }
 }
