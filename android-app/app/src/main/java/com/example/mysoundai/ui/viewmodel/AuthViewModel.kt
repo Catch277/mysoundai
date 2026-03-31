@@ -21,6 +21,20 @@ sealed class AuthState {
 class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     var authUIState by mutableStateOf<AuthState>(AuthState.Idle)
         private set
+    var userSettings by mutableStateOf<Map<String, Any>>(emptyMap())
+        private set
+    val currentUser = repository.authState.stateIn(
+        scope = viewModelScope,
+        started = SharingStarted.WhileSubscribed(5000),
+        initialValue = repository.getCurrentUser()
+    )
+    init {
+        viewModelScope.launch {
+            currentUser.collect { user ->
+                if (user != null) loadSettings()
+            }
+        }
+    }
 
     fun signUp(email: String, password: String) {
         viewModelScope.launch {
@@ -34,15 +48,11 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
     fun resetState() {
         authUIState = AuthState.Idle
     }
-    val currentUser = repository.authState.stateIn(
-        scope = viewModelScope,
-        started = SharingStarted.WhileSubscribed(5000),
-        initialValue = repository.getCurrentUser()
-    )
 
     fun handleSignOut() {
         repository.signOut()
         authUIState = AuthState.Idle
+        userSettings = emptyMap()
     }
 
     fun signInWithEmail(email: String, password: String) {
@@ -67,10 +77,34 @@ class AuthViewModel(private val repository: AuthRepository) : ViewModel() {
 
     fun updateProfile(displayName: String? = null, photoUri: Uri? = null) {
         viewModelScope.launch {
+            authUIState = AuthState.Loading
             val result = repository.updateProfile(displayName, photoUri)
-            authUIState = if (result.isSuccess)
-                AuthState.Success("Cập nhật thành công")
-            else AuthState.Error(result.exceptionOrNull()?.message ?: "Cập nhật thất bại")
+            if (result.isSuccess) {
+                if (displayName != null) updateSetting("display_name", displayName)
+                if (photoUri != null) updateSetting("photo_uri", photoUri.toString())
+                authUIState = AuthState.Success("Cập nhật thành công")
+            }
+            else authUIState = AuthState.Error(result.exceptionOrNull()?.message ?: "Cập nhật thất bại")
+        }
+    }
+
+    //load setting when user logged in successfully
+    fun loadSettings() {
+        viewModelScope.launch {
+            val settings = repository.getUserSettings()
+            if (settings != null) {
+                userSettings = settings
+            }
+        }
+    }
+
+    //Update specific setting
+    fun updateSetting(key: String, value: Any) {
+        val newSettings =  userSettings.toMutableMap()
+        newSettings[key] = value
+        userSettings = newSettings
+        viewModelScope.launch {
+            repository.saveUserSettings(mapOf(key to value))
         }
     }
 }

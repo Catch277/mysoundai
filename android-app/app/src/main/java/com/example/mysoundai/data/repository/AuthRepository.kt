@@ -2,14 +2,19 @@ package com.example.mysoundai.data.repository
 
 import android.net.Uri
 import com.example.mysoundai.data.model.UserData
+import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.userProfileChangeRequest
+import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class AuthRepository(private val auth: FirebaseAuth) {
+    private val firestore = Firebase.firestore
+
     fun getCurrentUser(): UserData? {
         val user = auth.currentUser
         return user?.let {
@@ -77,4 +82,25 @@ class AuthRepository(private val auth: FirebaseAuth) {
         } catch (e: Exception) {
         Result.failure(e)
     }
+
+    suspend fun saveUserSettings(settings: Map<String, Any>) = try {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            firestore.collection("users").document(uid)
+                .set(settings, SetOptions.merge())
+                .await()
+            Result.success(Unit)
+        } else {
+            Result.failure(Exception("Người dùng chưa đăng nhập!"))
+        }
+    } catch (e: Exception) { Result.failure(e) }
+
+    suspend fun getUserSettings(): Map<String, Any>? = try {
+        val uid = auth.currentUser?.uid
+        if (uid != null) {
+            val snapshot = firestore.collection("users")
+                .document(uid).get().await()
+            snapshot.data
+        } else null
+    } catch (e: Exception) { null }
 }

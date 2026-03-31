@@ -16,6 +16,7 @@ import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import com.example.mysoundai.ui.viewmodel.HomeViewModel
 import com.example.mysoundai.ui.screens.LoginScreen
 import com.example.mysoundai.ui.screens.RegisterScreen
+import com.example.mysoundai.ui.screens.SettingsScreen
 import com.example.mysoundai.ui.screens.UpdateProfileScreen
 
 @Composable
@@ -49,6 +50,7 @@ fun AppNavigation(
                 }
             )
         }
+        // PROFILE SECTION //
         composable(Screen.Register.route) {
             RegisterScreen(
                 authViewModel = authViewModel,
@@ -70,8 +72,9 @@ fun AppNavigation(
             )
         }
         composable(Screen.Settings.route) {
-            SettingScreen(
-                onUpdateProfileClick = {
+            SettingsScreen(
+                authViewModel = authViewModel,
+                onNavigateToUpdateProfile = {
                     navController.navigate(Screen.UpdateProfile.route)
                 },
                 onBack = {
@@ -87,5 +90,6 @@ fun AppNavigation(
                 }
             )
         }
+        // PROFILE SECTION //
     }
 }

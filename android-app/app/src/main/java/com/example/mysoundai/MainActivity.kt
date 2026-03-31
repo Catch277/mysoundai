@@ -7,19 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import com.example.mysoundai.ui.screens.HomeScreen
 import com.example.mysoundai.ui.theme.MySoundAITheme
 import com.example.mysoundai.ui.viewmodel.HomeViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mysoundai.di.AppContainer
-import com.example.mysoundai.data.remote.SpotifyAuthManager
-import android.content.Intent
-import android.net.Uri
-import android.util.Log
-import androidx.compose.foundation.layout.padding
+import androidx.activity.viewModels
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -28,19 +22,20 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
-import androidx.navigation.NavHost
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import com.example.mysoundai.ui.navigation.AppNavigation
 import com.example.mysoundai.ui.navigation.bottomNavItems
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 
 
 class MainActivity : ComponentActivity() {
+    private val authViewModel: AuthViewModel by viewModels {
+        viewModelFactory {
+            initializer { AuthViewModel(AppContainer.authRepository) }
+        }
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -56,7 +51,7 @@ class MainActivity : ComponentActivity() {
         }
 
         setContent {
-            MySoundAITheme {
+            MySoundAITheme(authViewModel = authViewModel) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background

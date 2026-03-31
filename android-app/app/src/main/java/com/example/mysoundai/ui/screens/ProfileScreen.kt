@@ -57,7 +57,7 @@ fun ProfileScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .background(Color.Black)
-                .padding(horizontal = 8.dp, vertical = 4.dp),
+                .padding(8.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -163,7 +163,7 @@ fun UserInfoSection(user: UserData,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onSignOutClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1DB954))) {
+            colors = ButtonDefaults.buttonColors(Color(0xFF1DB954))) {
             Text("Đăng xuất",
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,

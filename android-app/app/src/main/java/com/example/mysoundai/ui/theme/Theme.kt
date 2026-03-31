@@ -9,6 +9,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
+import com.example.mysoundai.ui.viewmodel.AuthViewModel
 
 private val DarkColorScheme = darkColorScheme(
     primary = Purple80,
@@ -21,6 +22,7 @@ private val LightColorScheme = lightColorScheme(
     secondary = PurpleGrey40,
     tertiary = Pink40
 
+
     /* Other default colors to override
     background = Color(0xFFFFFBFE),
     surface = Color(0xFFFFFBFE),
@@ -32,19 +34,25 @@ private val LightColorScheme = lightColorScheme(
     */
 )
 
+
 @Composable
 fun MySoundAITheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    authViewModel: AuthViewModel,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val appTheme = AppTheme.from(authViewModel.userSettings["theme"] as? String)
+    val darkTheme = when (appTheme) {
+        AppTheme.LIGHT -> false
+        AppTheme.DARK -> true
+        AppTheme.SYSTEM -> isSystemInDarkTheme()
+    }
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
             if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-
         darkTheme -> DarkColorScheme
         else -> LightColorScheme
     }
@@ -55,3 +63,4 @@ fun MySoundAITheme(
         content = content
     )
 }
+
