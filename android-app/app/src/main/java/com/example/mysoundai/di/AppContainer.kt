@@ -1,20 +1,41 @@
 package com.example.mysoundai.di
 
+import android.content.Context
+import com.example.mysoundai.data.local.LanguagePreference
+import com.example.mysoundai.data.local.ThemePreference
 import com.example.mysoundai.data.repository.AuthRepository
 import com.example.mysoundai.data.repository.MusicRepositoryImpl
 import com.example.mysoundai.domain.repository.MusicRepository
 import com.google.firebase.auth.FirebaseAuth
+import androidx.core.content.edit
 
 object AppContainer {
+    lateinit var themePreference: ThemePreference
+        private set
+    lateinit var languagePreference: LanguagePreference
+        private set
+    private lateinit var appContext: Context
+
+    fun init(context: Context) {
+        themePreference = ThemePreference(context)
+        languagePreference = LanguagePreference(context)
+        appContext = context.applicationContext
+    }
+
     val musicRepository: MusicRepository by lazy {
         MusicRepositoryImpl(NetworkModule.apiService)
+    }
+
+    val authRepository: AuthRepository by lazy {
+        AuthRepository(firebaseAuth)
     }
 
     private val firebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
 
-    val authRepository: AuthRepository by lazy {
-        AuthRepository(firebaseAuth)
+    fun saveLanguageSync(langCode: String) {
+        val prefs = appContext.getSharedPreferences("lang_prefs", Context.MODE_PRIVATE)
+        prefs.edit { putString("language_code", langCode) }
     }
 }

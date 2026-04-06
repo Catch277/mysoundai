@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -40,7 +39,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import com.example.mysoundai.R
 import com.example.mysoundai.ui.components.ToastMessage
 import com.example.mysoundai.ui.viewmodel.AuthState
 import kotlinx.coroutines.delay
@@ -54,11 +55,10 @@ fun UpdateProfileScreen(
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
     var toastMessage by remember { mutableStateOf("") }
     val uiState = authViewModel.authUIState
+    val hasChanges = newDisplayname.isNotBlank() || selectedImageUri != null
     val imagePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
-    ) { uri: Uri? ->
-        selectedImageUri = uri
-    }
+    ) { uri: Uri? -> selectedImageUri = uri }
 
     LaunchedEffect(uiState) {
         when (uiState) {
@@ -72,15 +72,13 @@ fun UpdateProfileScreen(
                 toastMessage = uiState.message
                 authViewModel.resetState()
             }
-
             else -> {}
         }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
-            modifier = Modifier
-                .fillMaxSize(),
+            modifier = Modifier.fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Row(
@@ -88,33 +86,33 @@ fun UpdateProfileScreen(
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "Cập nhật hồ sơ",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
                 IconButton(onClick = onBack) {
                     Icon(
                         Icons.AutoMirrored.Filled.ArrowBack,
                         tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "Back"
+                        contentDescription = stringResource(R.string.action_back)
                     )
                 }
+                Text(
+                    stringResource(R.string.update_profile_title),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
             }
 
             Column(modifier = Modifier
                 .fillMaxSize()
                 .padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally) {
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
                 Spacer(modifier = Modifier.height(24.dp))
                 if (selectedImageUri != null) {
                     AsyncImage(
                         model = selectedImageUri,
-                        contentDescription = "Ảnh đại diện mới",
+                        contentDescription = stringResource(R.string.update_profile_new_avatar),
                         modifier = Modifier.size(100.dp).clip(CircleShape),
                         contentScale = ContentScale.Crop
                     )
@@ -130,13 +128,13 @@ fun UpdateProfileScreen(
                 TextButton(
                     onClick = { imagePickerLauncher.launch("image/*") },
                 ) {
-                    Text("Chọn ảnh từ thư viện ảnh")
+                    Text(stringResource(R.string.update_profile_pick_image))
                 }
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = newDisplayname,
                     onValueChange = { newDisplayname = it },
-                    label = { Text("Tên người dùng mới") },
+                    label = { Text(stringResource(R.string.update_profile_name_label)) },
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(24.dp))
@@ -149,7 +147,7 @@ fun UpdateProfileScreen(
                     },
                     colors = ButtonDefaults.buttonColors(   Color(0xFF1DB954)),
                     modifier = Modifier.fillMaxWidth(),
-                    enabled = uiState !is AuthState.Loading
+                    enabled = uiState !is AuthState.Loading && hasChanges
                 ) {
                     if (uiState is AuthState.Loading)
                         CircularProgressIndicator(
@@ -157,14 +155,14 @@ fun UpdateProfileScreen(
                             strokeWidth = 2.dp,
                             color = MaterialTheme.colorScheme.onPrimary
                         )
-                    else Text("Lưu cập nhật",
+                    else Text(stringResource(R.string.update_profile_save),
                         fontWeight = FontWeight.Bold,
                         color = Color.White)
                 }
             }
         }
         if (toastMessage.isNotEmpty()) {
-            ToastMessage(message = toastMessage, duration = 2000)
+            ToastMessage(toastMessage, 2000)
             LaunchedEffect(toastMessage) {
                 delay(2000)
                 toastMessage = ""

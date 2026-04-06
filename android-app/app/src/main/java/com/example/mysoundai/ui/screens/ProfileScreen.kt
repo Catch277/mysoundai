@@ -2,7 +2,6 @@ package com.example.mysoundai.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -22,9 +21,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -38,6 +35,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil.compose.AsyncImage
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import com.example.mysoundai.data.model.UserData
+import androidx.compose.ui.res.stringResource
+import com.example.mysoundai.R
+import com.example.mysoundai.ui.viewmodel.AuthState
 
 
 @Composable
@@ -48,6 +48,8 @@ fun ProfileScreen(
     onLoginClick: () -> Unit
 ) {
     val user by authViewModel.currentUser.collectAsStateWithLifecycle()
+    val uiState = authViewModel.authUIState
+
 
     Column(
         modifier = Modifier.
@@ -62,7 +64,7 @@ fun ProfileScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
                 Text(
-                    text = "Cá nhân",
+                    text = stringResource(R.string.profile_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = Color.White
@@ -70,7 +72,7 @@ fun ProfileScreen(
                 IconButton(onClick = onSettingsClick) {
                     Icon(
                         imageVector = Icons.Default.Settings,
-                        contentDescription = "Settings",
+                        contentDescription = stringResource(R.string.action_settings),
                         tint = Color.White
                         )
                 }
@@ -80,23 +82,23 @@ fun ProfileScreen(
         // --- AUTH SECTION  ---
         Column(modifier = Modifier.padding(16.dp)) {
             Spacer(modifier = Modifier.height(32.dp))
-            if (user != null) {
-                UserInfoSection(user = user!!) { authViewModel.handleSignOut() }
-            } else {
-                LoginOptionsSection(
+            user?.let {
+                 UserInfoSection(user = it) { authViewModel.handleSignOut() }
+            }   ?:    LoginOptionsSection(
                     onLoginEmailClick = onLoginClick,
                     onGoogleLoginClick = { /* Handle Google login */ },
-                    onFacebookLoginClick = { /* Handle Facebook login */ }
+                    onFacebookLoginClick = { /* Handle Facebook login */ },
+                    isLoading = uiState is AuthState.Loading
                 )
             }
-        }
         }
    }
 @Composable
 fun LoginOptionsSection(
     onLoginEmailClick: () -> Unit,
     onGoogleLoginClick: () -> Unit,
-    onFacebookLoginClick: () -> Unit
+    onFacebookLoginClick: () -> Unit,
+    isLoading: Boolean = false
 ) {
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -104,7 +106,7 @@ fun LoginOptionsSection(
         verticalArrangement = Arrangement.spacedBy(12.dp)
     ) {
         Text(
-            text = "Đăng nhập để lưu ngay danh sách phát của bạn",
+            text = stringResource(R.string.profile_login_prompt),
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
 
@@ -114,27 +116,29 @@ fun LoginOptionsSection(
             modifier = Modifier.fillMaxWidth(),
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF1DB954))
         ) {
-            Text(text = "Đăng nhập / Đăng ký với Email")
+            Text(text = stringResource(R.string.profile_login_email))
         }
-        Text(text = "hoặc", style = MaterialTheme.typography.bodySmall)
+        Text(text = stringResource(R.string.profile_or), style = MaterialTheme.typography.bodySmall)
         OutlinedButton(
             onClick = onGoogleLoginClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Text(text = "Tiếp tục với Google")
+            Text(text = stringResource(R.string.profile_login_google))
         }
         OutlinedButton(
             onClick = onFacebookLoginClick,
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
+            enabled = !isLoading
         ) {
-            Text("Tiếp tục với Facebook")
+            Text(stringResource(R.string.profile_login_facebook))
         }
     }
 }
 
 @Composable
-fun UserInfoSection(user: UserData,
-                    onSignOutClick: () -> Unit) {
+fun UserInfoSection(user: UserData, onSignOutClick: () -> Unit) {
+    val avatarDesc = stringResource(R.string.profile_avatar_description)
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -143,7 +147,7 @@ fun UserInfoSection(user: UserData,
         {
             AsyncImage(
                 model = user.profilePictureUrl,
-                contentDescription = "Ảnh đại diện",
+                contentDescription = avatarDesc,
                 modifier = Modifier.size(100.dp).clip(CircleShape),
                 contentScale = ContentScale.Crop
             )
@@ -151,20 +155,20 @@ fun UserInfoSection(user: UserData,
         else {
             Icon(
                 imageVector = Icons.Default.AccountCircle,
-                contentDescription = "Ảnh đại diện",
+                contentDescription = avatarDesc,
                 modifier = Modifier.size(100.dp),
                 tint = Color.Gray
             )
         }
         Spacer(modifier = Modifier.height(24.dp))
         Text(
-            text = user.userName ?: "Người dùng MySoundAI",
+            text = user.userName ?: stringResource(R.string.profile_default_username),
             style = MaterialTheme.typography.headlineSmall,
         )
         Spacer(modifier = Modifier.height(24.dp))
         Button(onClick = onSignOutClick,
             colors = ButtonDefaults.buttonColors(Color(0xFF1DB954))) {
-            Text("Đăng xuất",
+            Text(stringResource(R.string.profile_sign_out),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
                 color = Color.White)

@@ -1,8 +1,8 @@
 package com.example.mysoundai.ui.screens
 
+import androidx.appcompat.app.AppCompatDelegate
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -30,6 +30,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,10 +39,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.mysoundai.R
+import com.example.mysoundai.ui.components.ToastMessage
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,39 +57,70 @@ fun SettingsScreen(
 ) {
     val user by authViewModel.currentUser.collectAsStateWithLifecycle(null)
     val isLoggedIn = user != null
-    var showDialog by remember { mutableStateOf(false) }
-    val currentTheme = authViewModel.userSettings["theme"] as? String ?: "SYSTEM"
+    var showThemeDialog by remember { mutableStateOf(false) }
+    val userSettings = authViewModel.userSettings
+
+    val currentTheme = userSettings["theme"] as? String ?: "SYSTEM"
+    var toastMessage by remember { mutableStateOf("") }
+    var showLangDialog by remember { mutableStateOf(false) }
+
+    val labelLight      = stringResource(R.string.theme_light)
+    val labelDark       = stringResource(R.string.theme_dark)
+    val labelSystem     = stringResource(R.string.theme_system)
+    val msgThemeChanged = stringResource(R.string.settings_theme_changed)
+
+    val langVietnamese  = stringResource(R.string.lang_vietnamese)
+    val langEnglish     = stringResource(R.string.lang_english)
+    val msgLangChanged  = stringResource(R.string.settings_lang_changed)
+    val currentLang = authViewModel.userSettings["language"] as? String
+        ?: AppCompatDelegate.getApplicationLocales()
+            .toLanguageTags().take(2).ifEmpty { "vi" }
+    val currentLangLabel = if (currentLang == "vi") langVietnamese else langEnglish
+
+    val themeLabel = when (currentTheme) {
+        "LIGHT" -> labelLight
+        "DARK" -> labelDark
+        else -> labelSystem
+    }
+    val themeOptions = listOf(
+        "LIGHT" to labelLight,
+        "DARK" to labelDark,
+        "SYSTEM" to labelSystem
+    )
+
     Scaffold(
         topBar = {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(MaterialTheme.colorScheme.surface)
                     .padding(8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "Cài đặt",
-                    style = MaterialTheme.typography.headlineMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-                if (!isLoggedIn) {
-                    Text("Vui lòng đăng nhập để tùy chỉnh",
-                        style = MaterialTheme.typography.titleSmall,
-                        color = Color.Gray
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    IconButton(onClick = onBack) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            tint = MaterialTheme.colorScheme.onSurface,
+                            contentDescription = stringResource(R.string.action_back)
+                        )
+                    }
+                    Text(
+                        stringResource(R.string.settings_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onSurface
                     )
                 }
-                IconButton(onClick = onBack) {
-                    Icon(
-                        Icons.AutoMirrored.Filled.ArrowBack,
-                        tint = MaterialTheme.colorScheme.onSurface,
-                        contentDescription = "Back"
-                    )
+                    if (!isLoggedIn) {
+                        Text(
+                            stringResource(R.string.settings_login_hint),
+                            style = MaterialTheme.typography.titleSmall,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(start = 16.dp, bottom = 4.dp)
+                        )
+                    }
                 }
             }
-        }
     ) { padding ->
         LazyColumn(
             modifier = Modifier
@@ -94,9 +130,9 @@ fun SettingsScreen(
             // Cập nhật Hồ sơ
             item {
                 ListItem(
-                    headlineContent = { Text("Hồ sơ",
+                    headlineContent = { Text(stringResource(R.string.settings_profile),
                                       color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
-                    supportingContent = { Text("Thay đổi tên hiển thị, ảnh đại diện",
+                    supportingContent = { Text(stringResource(R.string.settings_profile_desc),
                         color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
                     leadingContent = { Icon(Icons.Default.Person, contentDescription = null,
                         tint = if (isLoggedIn) LocalContentColor.current else Color.Gray) },
@@ -104,10 +140,11 @@ fun SettingsScreen(
                         Icon(
                             Icons.Default.ChevronRight,
                             contentDescription = null
-                        )
-                    }
+                        ) }
                     },
-                    modifier = Modifier.clickable(enabled = isLoggedIn) {
+                    modifier = Modifier
+                        .alpha(if (isLoggedIn) 1f else 0.5f)
+                        .clickable(enabled = isLoggedIn) {
                         onNavigateToUpdateProfile()
                     }
                 )
@@ -115,15 +152,10 @@ fun SettingsScreen(
             }
             // Cập nhật Giao diện
             item {
-                val themeLabel = when(currentTheme) {
-                    "LIGHT" -> "Sáng"
-                    "DARK" -> "Tối"
-                    else -> "Hệ thống"
-                }
                 ListItem(
-                    headlineContent = { Text("Giao diện",
+                    headlineContent = { Text(stringResource(R.string.settings_theme),
                         color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
-                    supportingContent = { Text("Thiết lập giao diện chủ đề\nChế độ hiện tại: $themeLabel",
+                    supportingContent = { Text(stringResource(R.string.settings_theme_desc, themeLabel),
                         color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
                     leadingContent = { Icon(Icons.Default.Palette, contentDescription = null,
                         tint = if (isLoggedIn) LocalContentColor.current else Color.Gray) },
@@ -134,24 +166,26 @@ fun SettingsScreen(
                         )
                     }
                                       },
-                    modifier = Modifier.clickable(enabled = isLoggedIn) {
-                        showDialog = true
+                    modifier = Modifier
+                        .alpha(if (isLoggedIn) 1f else 0.5f)
+                        .clickable(enabled = isLoggedIn) {
+                        showThemeDialog = true
                     }
                 )
-                if (showDialog) {
+                if (showThemeDialog) {
                     AlertDialog(
-                        onDismissRequest = { showDialog = false },
-                        title = { Text("Chọn chế độ giao diện") },
+                        onDismissRequest = { showThemeDialog = false },
+                        title = { Text(stringResource(R.string.settings_theme_dialog_title)) },
                         text = {
                             Column {
-                                listOf("LIGHT" to "Sáng", "DARK" to "Tối", "SYSTEM" to "Hệ thống")
-                                    .forEach { (mode, label) ->
+                                themeOptions.forEach { (mode, label) ->
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .clickable {
                                                     authViewModel.updateSetting("theme", mode)
-                                                    showDialog = false
+                                                    toastMessage = "$msgThemeChanged $label"
+                                                    showThemeDialog = false
                                                 }
                                                 .padding(16.dp),
                                             verticalAlignment = Alignment.CenterVertically
@@ -174,22 +208,74 @@ fun SettingsScreen(
             // Cập nhật Ngôn ngữ
             item {
                 ListItem(
-                    headlineContent = { Text("Ngôn ngữ") },
-                    supportingContent = { Text("Tiếng Việt") },
-                    leadingContent = { Icon(Icons.Default.Flag, contentDescription = null) },
-                    modifier = Modifier.alpha(0.5f)
+                    headlineContent = { Text(stringResource(R.string.settings_language),
+                        color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
+                    supportingContent = { Text(currentLangLabel,
+                        color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
+                    leadingContent = { Icon(Icons.Default.Flag, contentDescription = null,
+                        tint = if (isLoggedIn) LocalContentColor.current else Color.Gray) },
+                    trailingContent = {
+                        if (isLoggedIn) Icon(Icons.Default.ChevronRight, contentDescription = null)
+                    },
+                    modifier = Modifier
+                        .alpha(if (isLoggedIn) 1f else 0.5f)
+                        .clickable(enabled = isLoggedIn) {
+                        showLangDialog = true
+                    }
                 )
+                if (showLangDialog) {
+                    val langOptions = listOf("vi" to langVietnamese, "en" to langEnglish)
+                    AlertDialog(
+                        onDismissRequest = { showLangDialog = false },
+                        title = { Text(stringResource(R.string.settings_lang_dialog_title)) },
+                        text = {
+                            Column {
+                                langOptions.forEach { (code, label) ->
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .clickable {
+                                                authViewModel.updateLanguage(code)
+                                                toastMessage = msgLangChanged
+                                                showLangDialog = false
+                                            }
+                                            .padding(16.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        RadioButton(selected = currentLang == code, onClick = null)
+                                        Spacer(Modifier.width(12.dp))
+                                        Text(label)
+                                    }
+                                }
+                            }
+                        },
+                        confirmButton = { }
+                    )
+                }
                 HorizontalDivider()
             }
             // Cập nhật Đã tải
             item {
                 ListItem(
-                    headlineContent = { Text("Đã tải") },
-                    supportingContent = { Text("Quản lý nhạc ngoại tuyến") },
-                    leadingContent = { Icon(Icons.Default.Download, null) },
-                    modifier = Modifier.alpha(0.5f)
+                    headlineContent = { Text(stringResource(R.string.settings_downloads),
+                            color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
+                    supportingContent = { Text(stringResource(R.string.settings_downloads_desc),
+                            color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
+                    leadingContent = { Icon(Icons.Default.Download, contentDescription = null,
+                            tint = if (isLoggedIn) LocalContentColor.current else Color.Gray) },
+                    trailingContent = {
+                        if (isLoggedIn) Icon(Icons.Default.ChevronRight, contentDescription = null)
+                    },
+                    modifier = Modifier.alpha(if (isLoggedIn) 1f else 0.5f)
                 )
             }
+        }
+    }
+    if (toastMessage.isNotEmpty()) {
+        ToastMessage(toastMessage, 2000)
+        LaunchedEffect(toastMessage) {
+            delay(2000)
+            toastMessage = ""
         }
     }
 }

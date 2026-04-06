@@ -22,7 +22,6 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LargeTopAppBar
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -35,7 +34,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
@@ -45,6 +43,8 @@ import com.example.mysoundai.ui.viewmodel.AuthState
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import com.example.mysoundai.R
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -58,22 +58,41 @@ fun LoginScreen(
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var toastMessage by remember { mutableStateOf("") }
-    val context = LocalContext.current
     val uiState = authViewModel.authUIState
+    var emailError by remember { mutableStateOf(false) }
+    var passwordError by remember { mutableStateOf(false) }
+    var isLoginAttempt by remember { mutableStateOf(false) }
+    val msgEmailAndPassword = stringResource(R.string.login_error_email_and_password)
+    val msgEmailEmpty = stringResource(R.string.login_error_email_empty)
+    val msgPasswordEmpty = stringResource(R.string.login_error_password_empty)
+    val msgPasswordShort = stringResource(R.string.login_error_password_short)
+    val msgResetSent = stringResource(R.string.login_reset_sent)
+    val msgEmailRequired = stringResource(R.string.login_error_email_required_for_reset)
+    val msgSignInSuccess = stringResource(R.string.login_success)
+    val msgSignInFailed = stringResource(R.string.login_error_failed)
+    val msgResetFailed = stringResource(R.string.login_error_reset_failed)
 
     LaunchedEffect(uiState) {
         when (uiState) {
             is AuthState.Success -> {
-                toastMessage = uiState.message
+                if (isLoginAttempt) {
+                    toastMessage = when (uiState.message) {
+                        "SIGN_IN_SUCCESS" -> msgSignInSuccess
+                        "RESET_EMAIL_SENT" -> msgResetSent
+                        else -> uiState.message
+                    }
+                    onBack()
+                }
                 authViewModel.resetState()
-                onBack()
             }
-
             is AuthState.Error -> {
-                toastMessage = uiState.message
+                toastMessage = when (uiState.message) {
+                    "ERROR_SIGN_IN_FAILED" -> msgSignInFailed
+                    "ERROR_RESET_FAILED" -> msgResetFailed
+                    else -> uiState.message
+                }
                 authViewModel.resetState()
             }
-
             else -> {
             }
         }
@@ -89,19 +108,19 @@ fun LoginScreen(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        "Đăng nhập",
-                        style = MaterialTheme.typography.headlineMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White
-                    )
                     IconButton(onClick = onBack) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
                             tint = Color.White,
-                            contentDescription = "Back"
+                            contentDescription = stringResource(R.string.action_back)
                         )
                     }
+                    Text(
+                        stringResource(R.string.login_title),
+                        style = MaterialTheme.typography.headlineMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
                 }
             }
         ) { padding ->
@@ -112,18 +131,18 @@ fun LoginScreen(
             ) {
                 OutlinedTextField(
                     value = email,
-                    onValueChange = { email = it },
+                    onValueChange = { email = it; emailError = false },
                     label = { Text("Email") },
-                    isError = email.isEmpty() && toastMessage.contains("email"),
+                    isError = emailError,
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 OutlinedTextField(
                     value = password,
-                    onValueChange = { password = it },
-                    label = { Text("Mật khẩu") },
+                    onValueChange = { password = it; passwordError= false },
+                    label = { Text(stringResource(R.string.login_password_label)) },
                     modifier = Modifier.fillMaxWidth(),
-                    isError = password.isEmpty() && toastMessage.contains("mật khẩu"),
+                    isError = passwordError,
                     visualTransformation = if (isPasswordVisible)
                         VisualTransformation.None
                     else PasswordVisualTransformation(),
@@ -131,7 +150,7 @@ fun LoginScreen(
                         val icon = if (isPasswordVisible) Icons.Filled.Visibility
                         else Icons.Filled.VisibilityOff
                         IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
-                            Icon(imageVector = icon, contentDescription = "Visibility")
+                            Icon(imageVector = icon, stringResource(R.string.login_toggle_password))
                         }
                     }
                 )
@@ -140,34 +159,36 @@ fun LoginScreen(
                         email = email.trim()
                         if (email.isNotEmpty()) {
                             authViewModel.sendPasswordResetEmail(email)
-                            toastMessage = "Đã gửi link reset mật khẩu đến email của bạn!"
+                            toastMessage = msgResetSent
                         } else {
-                            toastMessage = "Vui lòng nhập email của bạn!"
+                            toastMessage = msgEmailRequired
                         }
                     },
                     modifier = Modifier.wrapContentWidth(Alignment.End)
                 ) {
-                    Text("Quên mật khẩu?", color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(R.string.login_forgot_password), color = MaterialTheme.colorScheme.primary)
                 }
                 Spacer(modifier = Modifier.height(24.dp))
                 Button(
                     onClick = {
                         email = email.trim()
-                        password = password.trim()
+                        emailError = email.isEmpty()
+                        passwordError = password.isEmpty()
                         when {
                             email.isEmpty() && password.isEmpty() -> {
-                                toastMessage = "Vui lòng nhập email và mật khẩu!"
+                                toastMessage = msgEmailAndPassword
                             }
                             email.isEmpty() -> {
-                                toastMessage = "Vui lòng nhập email!"
+                                toastMessage = msgEmailEmpty
                             }
                             password.isEmpty() -> {
-                                toastMessage = "Vui lòng nhập mật khẩu!"
+                                toastMessage = msgPasswordEmpty
                             }
                             password.length < 6 -> {
-                                toastMessage = "Mật khẩu phải có ít nhất 6 ký tự!"
+                                toastMessage = msgPasswordShort
                             }
                             else -> {
+                                isLoginAttempt = true
                                 authViewModel.signInWithEmail(email, password)
                             }
                         }
@@ -181,13 +202,13 @@ fun LoginScreen(
                             modifier = Modifier.size(20.dp),
                             strokeWidth = 2.dp
                         )
-                    else Text("Đăng nhập")
+                    else Text(stringResource(R.string.login_button))
                 }
                 TextButton(
                     onClick = onNavigateToRegister,
                     modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Chưa có tài khoản? Đăng ký ngay")
+                    Text(stringResource(R.string.login_no_account))
                 }
             }
         }

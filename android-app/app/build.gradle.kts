@@ -40,6 +40,8 @@ android {
 }
 
 dependencies {
+    implementation("com.google.android.material:material:1.13.0")
+    implementation("androidx.datastore:datastore-preferences:1.2.1")
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))
     implementation("com.google.firebase:firebase-firestore-ktx")
     implementation("com.google.firebase:firebase-analytics")
@@ -55,6 +57,8 @@ dependencies {
     implementation(libs.androidx.credentials)
     implementation(libs.androidx.credentials.play.services.auth)
     implementation(libs.googleid)
+    implementation(libs.androidx.ui)
+    implementation(libs.androidx.appcompat)
     val room_version = "2.8.4"
     implementation("androidx.room:room-runtime:$room_version")
     implementation("androidx.room:room-ktx:$room_version")

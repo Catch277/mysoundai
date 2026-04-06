@@ -1,8 +1,8 @@
 package com.example.mysoundai
 
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -13,7 +13,6 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import com.example.mysoundai.di.AppContainer
-import androidx.activity.viewModels
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
@@ -25,17 +24,14 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
 import com.example.mysoundai.ui.navigation.AppNavigation
 import com.example.mysoundai.ui.navigation.bottomNavItems
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
 
 
-class MainActivity : ComponentActivity() {
-    private val authViewModel: AuthViewModel by viewModels {
-        viewModelFactory {
-            initializer { AuthViewModel(AppContainer.authRepository) }
-        }
-    }
+class MainActivity : AppCompatActivity() {
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -46,18 +42,22 @@ class MainActivity : ComponentActivity() {
                 HomeViewModel(AppContainer.musicRepository)
             }
             initializer {
-                AuthViewModel(AppContainer.authRepository)
+                AuthViewModel(
+                    AppContainer.authRepository,
+                    AppContainer.themePreference,
+                    AppContainer.languagePreference
+                    )
             }
         }
 
         setContent {
+            val homeViewModel: HomeViewModel = viewModel(factory = factory)
+            val authViewModel: AuthViewModel = viewModel(factory = factory)
             MySoundAITheme(authViewModel = authViewModel) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    val homeViewModel: HomeViewModel = viewModel(factory = factory)
-                    val authViewModel: AuthViewModel = viewModel(factory = factory)
                     MainScreen(homeViewModel = homeViewModel, authViewModel = authViewModel)
                 }
             }
@@ -95,8 +95,8 @@ fun MainScreen(homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
                 val currentRoute = navBackStackEntry?.destination?.route
                 bottomNavItems.forEach { screen ->
                     NavigationBarItem(
-                        icon = { Icon(screen.icon!!, contentDescription = null)},
-                        label = { Text(screen.title!!) },
+                        icon = { screen.icon?.let { Icon(it, contentDescription = null)}},
+                        label = { screen.titleRes?.let {Text(stringResource(it))}},
                         selected = currentRoute == screen.route,
                         onClick = {
                             navController.navigate(screen.route) {
@@ -110,6 +110,8 @@ fun MainScreen(homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
                         colors = NavigationBarItemDefaults.colors(
                             selectedIconColor = Color(0xFF1DB954),
                             unselectedIconColor = Color.Gray,
+                            selectedTextColor = Color(0xFF1DB954),
+                            unselectedTextColor = Color.Gray,
                             indicatorColor = Color.Transparent
                         )
                     )

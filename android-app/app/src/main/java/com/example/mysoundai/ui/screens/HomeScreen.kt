@@ -1,6 +1,5 @@
 package com.example.mysoundai.ui.screens
 
-import android.R.attr.title
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -28,21 +27,12 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.painterResource
 import com.example.mysoundai.R
-import android.content.Intent
-import com.example.mysoundai.data.remote.SpotifyAuthManager
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.gestures.ScrollableState
-import androidx.compose.foundation.gestures.animateScrollBy
 import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.zIndex
-import androidx.room.util.query
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,7 +40,6 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
     val songs = viewModel.songList.value
     val isLoading = viewModel.isLoading.value
     val scope = rememberCoroutineScope()
-    val context = LocalContext.current
 
     val firstSongImageUrl = songs.firstOrNull()?.imageUrl ?: ""
     val scrollState = rememberLazyListState()
@@ -59,9 +48,14 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
             if (scrollState.firstVisibleItemIndex > 0) 0.7f else 1f
         }
     }
+
+    val titleSuggested = stringResource(R.string.home_title_suggested)
+    val titleSearchResults = stringResource(R.string.home_title_search_results)
+    val titleFeatured = stringResource(R.string.home_title_featured)
+
     DynamicGradientBox(imageUrl = firstSongImageUrl, modifier = Modifier.fillMaxSize()) {
         if (isLoading) {
-            CircularProgressIndicator(modifier = Modifier.align(androidx.compose.ui.Alignment.Center))
+            CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
             Column(
                 modifier = Modifier
@@ -113,8 +107,8 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
                     }
                     item {
                         val titleText = if (viewModel.searchQuery.isEmpty())
-                            "Gợi ý cho bạn"
-                        else "Kết quả tìm kiếm"
+                            titleSuggested
+                        else titleSearchResults
                         HomeRowTitle(title = titleText)
                     }
                     items(viewModel.filteredSongs) { song ->
@@ -123,7 +117,7 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
                     if (viewModel.filteredSongs.isEmpty() && viewModel.searchQuery.isNotEmpty()) {
                         item {
                             Text(
-                                text = "Không tìm thấy bài hát nào cho '${viewModel.searchQuery}'",
+                                text = stringResource(R.string.home_search_no_results, viewModel.searchQuery),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = Color.Gray,
                                 modifier = Modifier.padding(16.dp),
@@ -132,7 +126,7 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
                         }
                     }
                     item {
-                        HomeRowTitle("Playlist nổi bật")
+                        HomeRowTitle(titleFeatured)
                         LazyRow(contentPadding = PaddingValues(horizontal = 8.dp)) {
                             items(songs) { song ->
                                 SongCard(song = song)
@@ -140,7 +134,7 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
                         }
                     }
                     item {
-                        HomeRowTitle("Gợi ý cho bạn")
+                        HomeRowTitle(titleSuggested)
                     }
                     items(songs) { song ->
                         SongItem(song = song)
@@ -158,7 +152,6 @@ fun SearchBarComponent(query:String,
                        alpha: Float,
                        modifier: Modifier = Modifier
 ) {
-    var text by remember { mutableStateOf("") }
 
     TextField(
         value = query,
@@ -167,7 +160,7 @@ fun SearchBarComponent(query:String,
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(56.dp),
-        placeholder = { Text("Bạn muốn nghe gì?", color = Color.Gray)},
+        placeholder = { Text(stringResource(R.string.home_search_placeholder), color = Color.Gray)},
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
         colors = TextFieldDefaults.colors(
@@ -212,10 +205,27 @@ fun SearchBarComponent(query:String,
 
 @Composable
 fun HomeHeader() {
-    Text(text = "Chào buổi tối",
-        style = androidx.compose.material3.MaterialTheme.typography.headlineLarge,
-        color = androidx.compose.ui.graphics.Color.White,
-        modifier = Modifier.padding(bottom = 16.dp))
+    val morning = stringResource(R.string.home_greeting_morning)
+    val afternoon = stringResource(R.string.home_greeting_afternoon)
+    val evening = stringResource(R.string.home_greeting_evening)
+    val night = stringResource(R.string.home_greeting_night)
+
+    val greeting = remember {
+        val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
+        when (hour) {
+            in 5..12 -> morning
+            in 13..18 -> afternoon
+            in 19..23 -> evening
+            else -> night
+        }
+    }
+    Text(
+        text = greeting,
+        style = MaterialTheme.typography.headlineLarge,
+        color = Color.White,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 16.dp)
+    )
 }
 @Composable
 fun HomeRowTitle(title: String) {

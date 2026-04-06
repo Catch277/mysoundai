@@ -52,9 +52,12 @@ class AuthRepository(private val auth: FirebaseAuth) {
         }
     }
 
-    suspend fun signInWithEmail(email: String, password: String) = try {
+    suspend fun signInWithEmail(email: String, password: String): Result<UserData?> = try {
         auth.signInWithEmailAndPassword(email, password).await()
-        Result.success(auth.currentUser)
+        val userData = auth.currentUser?.let {
+            UserData(it.uid, it.displayName, it.photoUrl?.toString())
+        }
+        Result.success(userData)
     } catch (e: Exception) {
         Result.failure(e)
     }
@@ -65,22 +68,30 @@ class AuthRepository(private val auth: FirebaseAuth) {
     } catch (e: Exception) { Result.failure(e) }
 
     suspend fun signInWithGoogle(idToken: String): Result<UserData?> {
-        return Result.failure(Exception("Chưa cài đặt Google SDK"))
+        return Result.failure(Exception("ERROR_GOOGLE_SDK_NOT_CONFIGURED"))
     }
 
     suspend fun signInWithFacebook(accessToken: String): Result<UserData?> {
-        return Result.failure(Exception("Chưa cài đặt Facebook SDK"))
+        return Result.failure(Exception("ERROR_FACEBOOK_SDK_NOT_CONFIGURED"))
     }
 
-    suspend fun updateProfile(displayName: String? = null, photoUri: Uri? = null) = try {
-        val profileUpdates = userProfileChangeRequest {
-            displayName?.let { name -> this.displayName = name }
-            photoUri?.let { uri -> this.photoUri = uri }
-        }
-        auth.currentUser?.updateProfile(profileUpdates)?.await()
-        Result.success(Unit)
+    suspend fun updateProfile(displayName: String? = null, photoUri: Uri? = null): Result<UserData?> {
+        return try {
+            val user = auth.currentUser
+                ?: return Result.failure(Exception("ERROR_NOT_LOGGED_IN"))
+            val profileUpdates = userProfileChangeRequest {
+                displayName?.let { name -> this.displayName = name }
+                photoUri?.let { uri -> this.photoUri = uri }
+            }
+            user.updateProfile(profileUpdates).await()
+            user.reload().await()
+            val updatedUser = auth.currentUser?.let {
+                UserData(it.uid, it.displayName, it.photoUrl?.toString())
+            }
+            Result.success(updatedUser)
         } catch (e: Exception) {
-        Result.failure(e)
+            Result.failure(e)
+        }
     }
 
     suspend fun saveUserSettings(settings: Map<String, Any>) = try {
@@ -91,16 +102,15 @@ class AuthRepository(private val auth: FirebaseAuth) {
                 .await()
             Result.success(Unit)
         } else {
-            Result.failure(Exception("Người dùng chưa đăng nhập!"))
+            Result.failure(Exception("ERROR_NOT_LOGGED_IN"))
         }
     } catch (e: Exception) { Result.failure(e) }
 
-    suspend fun getUserSettings(): Map<String, Any>? = try {
+    suspend fun getUserSettings(): Result<Map<String, Any>?> = try {
         val uid = auth.currentUser?.uid
-        if (uid != null) {
+            ?: return Result.failure(Exception("ERROR_NOT_LOGGED_IN"))
             val snapshot = firestore.collection("users")
                 .document(uid).get().await()
-            snapshot.data
-        } else null
-    } catch (e: Exception) { null }
+            Result.success(snapshot.data)
+    } catch (e: Exception) { Result.failure(e) }
 }
