@@ -8,6 +8,9 @@ import com.example.mysoundai.data.repository.MusicRepositoryImpl
 import com.example.mysoundai.domain.repository.MusicRepository
 import com.google.firebase.auth.FirebaseAuth
 import androidx.core.content.edit
+import androidx.room.Room
+import com.example.mysoundai.data.local.room.AppDatabase
+import com.example.mysoundai.data.repository.DownloadRepository
 
 object AppContainer {
     lateinit var themePreference: ThemePreference
@@ -37,5 +40,19 @@ object AppContainer {
     fun saveLanguageSync(langCode: String) {
         val prefs = appContext.getSharedPreferences("lang_prefs", Context.MODE_PRIVATE)
         prefs.edit { putString("language_code", langCode) }
+    }
+
+    val database: AppDatabase by lazy {
+        Room.databaseBuilder(
+            appContext,
+            AppDatabase::class.java,
+            "mysoundai_db"
+        )
+            .fallbackToDestructiveMigration(true)
+            .build()
+    }
+
+    val downloadRepository: DownloadRepository by lazy {
+        DownloadRepository(database.songDao(), appContext)
     }
 }

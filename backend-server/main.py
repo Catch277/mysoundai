@@ -13,9 +13,10 @@ app = FastAPI(
 
 # Mô hình dữ liệu cho bài hát
 class Song(BaseModel):
-    id: int
+    id: str
     title: str
     artist: str
+    duration: int
     image_url: str
     audio_url: str
 
@@ -30,23 +31,26 @@ async def get_recommendations(prompt: str = "tâm trạng vui vẻ"):
 
     return [
         {
-            "id": 1,
+            "id": "1",
             "title": "Happy Song",
             "artist": "Artist A",
+            "duration": 215000,
             "image_url": "https://example.com/happy_song.jpg",
             "audio_url": "https://example.com/happy_song.mp3"
         },
         {
-            "id": 2,
+            "id": "2",
             "title": "Joyful Tune",
             "artist": "Artist B",
+            "duration": 215000,
             "image_url": "https://example.com/joyful_tune.jpg",
             "audio_url": "https://example.com/joyful_tune.mp3"
         },
         {
-            "id": 3,
+            "id": "3",
             "title": "Upbeat Melody",
             "artist": "Artist C",
+            "duration": 30000,
             "image_url": "https://example.com/upbeat_melody.jpg",
             "audio_url": "https://example.com/upbeat_melody.mp3"
         }

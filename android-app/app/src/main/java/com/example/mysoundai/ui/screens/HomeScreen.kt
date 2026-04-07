@@ -167,11 +167,15 @@ fun SearchBarComponent(query:String,
             focusedContainerColor = Color.White.copy(alpha = alpha),
             unfocusedContainerColor = Color.White.copy(alpha = alpha),
             disabledContainerColor = Color.White.copy(alpha = alpha),
+
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
 
-            unfocusedPlaceholderColor = Color.White.copy(alpha = 0.6f),
-            focusedPlaceholderColor = Color.White
+            focusedTextColor = Color.Black,
+            unfocusedTextColor = Color.Black,
+
+            unfocusedPlaceholderColor = Color.Black.copy(0.5f),
+            focusedPlaceholderColor = Color.Black.copy(0.7f)
         ),
         shape = RoundedCornerShape(25.dp),
         singleLine = true

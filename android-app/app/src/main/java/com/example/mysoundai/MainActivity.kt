@@ -28,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import com.example.mysoundai.ui.navigation.AppNavigation
 import com.example.mysoundai.ui.navigation.bottomNavItems
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
+import com.example.mysoundai.ui.viewmodel.DownloadViewModel
 
 
 class MainActivity : AppCompatActivity() {
@@ -38,6 +39,9 @@ class MainActivity : AppCompatActivity() {
 //        handleSpotifyCallback(intent)
 
         val factory = viewModelFactory {
+            initializer {
+                DownloadViewModel(AppContainer.downloadRepository)
+            }
             initializer {
                 HomeViewModel(AppContainer.musicRepository)
             }
@@ -53,12 +57,13 @@ class MainActivity : AppCompatActivity() {
         setContent {
             val homeViewModel: HomeViewModel = viewModel(factory = factory)
             val authViewModel: AuthViewModel = viewModel(factory = factory)
+            val downloadViewModel: DownloadViewModel = viewModel(factory = factory)
             MySoundAITheme(authViewModel = authViewModel) {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    MainScreen(homeViewModel = homeViewModel, authViewModel = authViewModel)
+                    MainScreen(homeViewModel = homeViewModel, authViewModel = authViewModel, downloadViewModel = downloadViewModel)
                 }
             }
         }
@@ -85,7 +90,7 @@ class MainActivity : AppCompatActivity() {
 }
 
 @Composable
-fun MainScreen(homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
+fun MainScreen(homeViewModel: HomeViewModel, authViewModel: AuthViewModel, downloadViewModel: DownloadViewModel) {
     val navController = rememberNavController()
 
     Scaffold(
@@ -123,6 +128,7 @@ fun MainScreen(homeViewModel: HomeViewModel, authViewModel: AuthViewModel) {
             navController = navController,
             homeViewModel = homeViewModel,
             authViewModel = authViewModel,
+            downloadViewModel = downloadViewModel,
             paddingValues = innerPadding
         )
     }

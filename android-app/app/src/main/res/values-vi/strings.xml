@@ -1,7 +1,6 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">MySoundAI</string>
-    <!--    ui/screens.HomeScreen-->
+    <!--     ui/screens.HomeScreen -->
     <string name="home_greeting_morning">Chào buổi sáng</string>
     <string name="home_greeting_afternoon">Chào buổi chiều</string>
     <string name="home_greeting_evening">Chào buổi tối</string>
@@ -11,8 +10,7 @@
     <string name="home_title_suggested">Gợi ý cho bạn</string>
     <string name="home_title_search_results">Kết quả tìm kiếm</string>
     <string name="home_title_featured">Playlist nổi bật</string>
-
-    <!--    ui/navigation/NavigationItem-->
+    <!--     ui/navigation/NavigationItem -->
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Khám phá</string>
     <string name="nav_library">Thư viện</string>
@@ -21,8 +19,8 @@
     <string name="nav_login">Đăng nhập</string>
     <string name="nav_settings">Cài đặt</string>
     <string name="nav_update_profile">Cập nhật hồ sơ</string>
-
-    <!--    ui/screens/LoginScreen-->
+    <string name="nav_downloads">Đã tải</string>
+    <!--     ui/screens/LoginScreen -->
     <string name="login_title">Đăng nhập</string>
     <string name="login_password_label">Mật khẩu</string>
     <string name="login_toggle_password">Hiện/ẩn mật khẩu</string>
@@ -33,11 +31,10 @@
     <string name="login_error_email_and_password">Vui lòng nhập email và mật khẩu!</string>
     <string name="login_error_email_empty">Vui lòng nhập email!</string>
     <string name="login_error_password_empty">Vui lòng nhập mật khẩu!</string>
-    <string name="login_error_password_short">Mật khẩu phải có ít nhất 6 ký tự!</string>
+    <string name="login_error_password_short">Mật khẩu phải có ít nhất 6 ký tự</string>
     <string name="login_reset_sent">Đã gửi link reset mật khẩu đến email của bạn!</string>
     <string name="login_error_email_required_for_reset">Vui lòng nhập email của bạn!</string>
-
-    <!--    ui/screens/ProfileScreen-->
+    <!--     ui/screens/ProfileScreen -->
     <string name="profile_title">Cá nhân</string>
     <string name="profile_login_prompt">Đăng nhập để lưu ngay danh sách phát của bạn</string>
     <string name="profile_login_email">Đăng nhập / Đăng ký với Email</string>
@@ -48,14 +45,12 @@
     <string name="profile_default_username">Người dùng MySoundAI</string>
     <string name="profile_sign_out">Đăng xuất</string>
     <string name="action_settings">Cài đặt</string>
-
-    <!--    ui/screens/RegisterScreen-->
+    <!--     ui/screens/RegisterScreen -->
     <string name="register_title">Tạo tài khoản</string>
     <string name="register_button">Đăng ký</string>
-    <!-- reuses login_password_label, login_toggle_password,
-         login_error_* and action_back from LoginScreen -->
-
-    <!--    ui/screens/SettingsScreen-->
+    <!--  reuses login_password_label, login_toggle_password,
+             login_error_* and action_back from LoginScreen  -->
+    <!--     ui/screens/SettingsScreen -->
     <string name="settings_title">Cài đặt</string>
     <string name="settings_login_hint">Vui lòng đăng nhập để tùy chỉnh</string>
     <string name="settings_profile">Hồ sơ</string>
@@ -75,15 +70,24 @@
     <string name="settings_lang_changed">Đã đổi ngôn ngữ</string>
     <string name="lang_vietnamese">Tiếng Việt</string>
     <string name="lang_english">English</string>
-
-    <!--    ui/screens/UpdateProfileScreen-->
+    <!--     ui/screens/UpdateProfileScreen -->
     <string name="update_profile_title">Cập nhật hồ sơ</string>
     <string name="update_profile_new_avatar">Ảnh đại diện mới</string>
     <string name="update_profile_pick_image">Chọn ảnh từ thư viện ảnh</string>
     <string name="update_profile_name_label">Tên người dùng mới</string>
     <string name="update_profile_save">Lưu cập nhật</string>
-
-    <!--    data/repository/AuthRepository-->
+    <!--     ui/screens/DownloadedMusicScreen -->
+    <string name="download_title">Đã tải</string>
+    <string name="download_empty_title">Chưa có bài hát nào được tải xuống</string>
+    <string name="download_empty_desc">Các bài hát bạn tải về để nghe ngoại tuyến sẽ xuất hiện tại đây.</string>
+    <string name="download_explore_btn">Đi đến Khám phá</string>
+    <string name="download_delete_success">Đã xóa %s thành công</string>
+    <string name="download_search_hint">Tìm trong danh sách tải…</string>
+    <string name="action_search">Tìm kiếm</string>
+    <string name="action_close">Đóng</string>
+    <string name="download_search_placeholder">Tìm trong bài đã tải…</string>
+    <string name="download_search_result_title">Kết quả tìm kiếm"</string>
+    <!--     data/repository/AuthRepository -->
     <string name="sign_up_success">Đăng ký thành công</string>
     <string name="sign_up_error">Đăng ký thất bại</string>
     <string name="login_success">Đăng nhập thành công</string>

@@ -1,7 +1,6 @@
 <resources>
     <string name="app_name">MySoundAI</string>
-
-<!--    ui/navigation/NavigationItem-->
+    <!--     ui/navigation/NavigationItem -->
     <string name="nav_home">Home</string>
     <string name="nav_search">Explore</string>
     <string name="nav_library">Library</string>
@@ -10,8 +9,8 @@
     <string name="nav_login">Login</string>
     <string name="nav_settings">Settings</string>
     <string name="nav_update_profile">Update Profile</string>
-
-<!--    ui/screens/HomeScreen-->
+    <string name="nav_downloads">Downloads</string>
+    <!--     ui/screens/HomeScreen -->
     <string name="home_greeting_morning">Good morning</string>
     <string name="home_greeting_afternoon">Good afternoon</string>
     <string name="home_greeting_evening">Good evening</string>
@@ -21,8 +20,7 @@
     <string name="home_title_suggested">Suggested for you</string>
     <string name="home_title_search_results">Search results</string>
     <string name="home_title_featured">Featured playlists</string>
-
-<!--    ui/screens/LoginScreen-->
+    <!--     ui/screens/LoginScreen -->
     <string name="login_title">Login</string>
     <string name="login_password_label">Password</string>
     <string name="login_toggle_password">Toggle password visibility</string>
@@ -36,8 +34,7 @@
     <string name="login_error_password_short">Password must be at least 6 characters</string>
     <string name="login_reset_sent">Password reset link sent to your email</string>
     <string name="login_error_email_required_for_reset">Please enter your email first</string>
-
-    <!--    ui/screens/ProfileScreen-->
+    <!--     ui/screens/ProfileScreen -->
     <string name="profile_title">Profile</string>
     <string name="profile_login_prompt">Sign in to save your playlists</string>
     <string name="profile_login_email">Sign in / Register with Email</string>
@@ -48,14 +45,12 @@
     <string name="profile_default_username">MySoundAI User</string>
     <string name="profile_sign_out">Sign out</string>
     <string name="action_settings">Settings</string>
-
-    <!--    ui/screens/RegisterScreen-->
+    <!--     ui/screens/RegisterScreen -->
     <string name="register_title">Create Account</string>
     <string name="register_button">Register</string>
-    <!-- reuses login_password_label, login_toggle_password,
-         login_error_* and action_back from LoginScreen -->
-
-    <!--    ui/screens/SettingsScreen-->
+    <!--  reuses login_password_label, login_toggle_password,
+             login_error_* and action_back from LoginScreen  -->
+    <!--     ui/screens/SettingsScreen -->
     <string name="settings_title">Settings</string>
     <string name="settings_login_hint">Please sign in to customize</string>
     <string name="settings_profile">Profile</string>
@@ -75,19 +70,27 @@
     <string name="settings_lang_changed">Language changed</string>
     <string name="lang_vietnamese">Tiếng Việt</string>
     <string name="lang_english">English</string>
-
-    <!--    ui/screens/UpdateProfileScreen-->
+    <!--     ui/screens/UpdateProfileScreen -->
     <string name="update_profile_title">Update Profile</string>
     <string name="update_profile_new_avatar">New profile picture</string>
     <string name="update_profile_pick_image">Choose from gallery</string>
     <string name="update_profile_name_label">New display name</string>
     <string name="update_profile_save">Save</string>
-
-    <!--    data/repository/AuthRepository-->
+    <!--     ui/screens/DownloadedMusicScreen -->
+    <string name="download_title">Downloads</string>
+    <string name="download_empty_title">No downloaded songs yet</string>
+    <string name="download_empty_desc">Songs you download for offline listening will appear here.</string>
+    <string name="download_explore_btn">Explore Now</string>
+    <string name="download_delete_success">Deleted %s successfully</string>
+    <string name="download_search_hint">Search in downloads…</string>
+    <string name="action_search">Search</string>
+    <string name="action_close">Close</string>
+    <string name="download_search_placeholder">Search downloads…</string>
+    <string name="download_search_result_title">Search results"</string>
+    <!--     data/repository/AuthRepository -->
     <string name="sign_up_success">Account created successfully</string>
     <string name="sign_up_error">Registration failed</string>
     <string name="login_success">Logged in successfully</string>
     <string name="login_error_failed">Login failed</string>
     <string name="login_error_reset_failed">Failed to send reset link</string>
-
 </resources>

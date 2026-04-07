@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import com.example.mysoundai.ui.screens.DownloadedMusicScreen
 import com.example.mysoundai.ui.screens.HomeScreen
 import com.example.mysoundai.ui.screens.ProfileScreen
 import com.example.mysoundai.ui.viewmodel.AuthViewModel
@@ -18,12 +19,14 @@ import com.example.mysoundai.ui.screens.LoginScreen
 import com.example.mysoundai.ui.screens.RegisterScreen
 import com.example.mysoundai.ui.screens.SettingsScreen
 import com.example.mysoundai.ui.screens.UpdateProfileScreen
+import com.example.mysoundai.ui.viewmodel.DownloadViewModel
 
 @Composable
 fun AppNavigation(
     navController: NavHostController,
     homeViewModel: HomeViewModel,
     authViewModel: AuthViewModel,
+    downloadViewModel: DownloadViewModel,
     paddingValues: PaddingValues
 ) {
     NavHost(
@@ -77,6 +80,9 @@ fun AppNavigation(
                 onNavigateToUpdateProfile = {
                     navController.navigate(Screen.UpdateProfile.route)
                 },
+                onNavigateToDownloads = {
+                    navController.navigate(Screen.Downloads.route)
+                },
                 onBack = {
                     navController.popBackStack()
                 }
@@ -85,6 +91,17 @@ fun AppNavigation(
         composable(Screen.UpdateProfile.route) {
             UpdateProfileScreen(
                 authViewModel = authViewModel,
+                onBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        composable(Screen.Downloads.route) {
+            DownloadedMusicScreen(
+                viewModel = downloadViewModel,
+                onNavigateToExplore = {
+                    navController.navigate(Screen.Home.route)
+                },
                 onBack = {
                     navController.popBackStack()
                 }

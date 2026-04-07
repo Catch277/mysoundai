@@ -53,6 +53,7 @@ import kotlinx.coroutines.delay
 fun SettingsScreen(
     authViewModel: AuthViewModel,
     onNavigateToUpdateProfile: () -> Unit,
+    onNavigateToDownloads: () -> Unit,
     onBack: () -> Unit
 ) {
     val user by authViewModel.currentUser.collectAsStateWithLifecycle(null)
@@ -74,8 +75,8 @@ fun SettingsScreen(
     val msgLangChanged  = stringResource(R.string.settings_lang_changed)
     val currentLang = authViewModel.userSettings["language"] as? String
         ?: AppCompatDelegate.getApplicationLocales()
-            .toLanguageTags().take(2).ifEmpty { "vi" }
-    val currentLangLabel = if (currentLang == "vi") langVietnamese else langEnglish
+            .toLanguageTags().take(2).ifEmpty { "en" }
+    val currentLangLabel = if (currentLang == "en") langEnglish else langVietnamese
 
     val themeLabel = when (currentTheme) {
         "LIGHT" -> labelLight
@@ -258,15 +259,19 @@ fun SettingsScreen(
             item {
                 ListItem(
                     headlineContent = { Text(stringResource(R.string.settings_downloads),
-                            color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
+                        color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
                     supportingContent = { Text(stringResource(R.string.settings_downloads_desc),
-                            color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
+                        color = if (isLoggedIn) Color.Unspecified else Color.Gray) },
                     leadingContent = { Icon(Icons.Default.Download, contentDescription = null,
-                            tint = if (isLoggedIn) LocalContentColor.current else Color.Gray) },
+                        tint = if (isLoggedIn) LocalContentColor.current else Color.Gray) },
                     trailingContent = {
                         if (isLoggedIn) Icon(Icons.Default.ChevronRight, contentDescription = null)
                     },
-                    modifier = Modifier.alpha(if (isLoggedIn) 1f else 0.5f)
+                    modifier = Modifier
+                        .alpha(if (isLoggedIn) 1f else 0.5f)
+                        .clickable(enabled = isLoggedIn) {
+                            onNavigateToDownloads()
+                        }
                 )
             }
         }
