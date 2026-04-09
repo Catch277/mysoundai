@@ -37,7 +37,9 @@ fun AppNavigation(
         exitTransition = { fadeOut(animationSpec = tween(400)) }
     ) {
         composable(Screen.Home.route) {
-            HomeScreen(viewModel = homeViewModel, paddingValues = paddingValues)
+            HomeScreen(viewModel = homeViewModel,
+                downloadViewModel = downloadViewModel,
+                paddingValues = paddingValues)
         }
         composable(Screen.Search.route) { /* Khám phá */ }
         composable(Screen.Library.route) { /* Thư viện */ }

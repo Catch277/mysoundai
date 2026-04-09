@@ -1,5 +1,8 @@
 package com.example.mysoundai.ui.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -23,17 +26,52 @@ fun ToastMessage(message: String, duration: Int = 2000) {
     var visible by remember { mutableStateOf(true) }
 
     LaunchedEffect(message) {
-        visible = true
-        delay(duration.toLong())
-        visible = false
+        if (message.isNotEmpty()) {
+            visible = true
+            delay(duration.toLong())
+            visible = false
+        }
     }
     if (visible) {
-        Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+        AnimatedVisibility(
+            visible = message.isNotEmpty(),
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.BottomCenter) {
+                Box(
+                    modifier = Modifier
+                        .padding(bottom = 80.dp)
+                        .background(Color(0XFF323232), shape = RoundedCornerShape(8.dp))
+                        .padding(horizontal = 16.dp, vertical = 12.dp),
+                ) {
+                    Text(text = message, color = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ToastMessage(message: String, trigger: Int, duration: Int = 2000, onDismiss: () -> Unit) {
+    LaunchedEffect(trigger) {
+        if (message.isNotEmpty()) {
+            delay(duration.toLong())
+            onDismiss()
+        }
+    }
+    AnimatedVisibility(
+        visible = message.isNotEmpty(),
+        enter = fadeIn(),
+        exit = fadeOut()
+    ) {
+        Box(modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.BottomCenter) {
             Box(
                 modifier = Modifier
-                    .padding(bottom = 48.dp)
+                    .padding(bottom = 80.dp)
                     .background(Color(0XFF323232), shape = RoundedCornerShape(8.dp))
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
+                    .padding(horizontal = 16.dp, vertical = 12.dp)
             ) {
                 Text(text = message, color = Color.White)
             }

@@ -20,6 +20,14 @@
     <string name="home_title_suggested">Suggested for you</string>
     <string name="home_title_search_results">Search results</string>
     <string name="home_title_featured">Featured playlists</string>
+    <string name="msg_download_success">Downloaded: %1$s</string>
+    <string name="msg_download_failed">Failed to download %1$s. Please try again!</string>
+    <string name="msg_song_already_exists">Song is already downloaded.</string>
+    <string name="msg_song_deleted">Deleted: %1$s</string>
+    <string name="msg_download_cancelled">Cancelled downloading: %1$s</string>
+    <string name="action_cancel">Cancel</string>
+    <string name="retry_download">Retry download</string>
+
     <!--     ui/screens/LoginScreen -->
     <string name="login_title">Login</string>
     <string name="login_password_label">Password</string>
@@ -50,6 +58,7 @@
     <string name="register_button">Register</string>
     <!--  reuses login_password_label, login_toggle_password,
              login_error_* and action_back from LoginScreen  -->
+
     <!--     ui/screens/SettingsScreen -->
     <string name="settings_title">Settings</string>
     <string name="settings_login_hint">Please sign in to customize</string>
@@ -70,12 +79,14 @@
     <string name="settings_lang_changed">Language changed</string>
     <string name="lang_vietnamese">Tiếng Việt</string>
     <string name="lang_english">English</string>
+
     <!--     ui/screens/UpdateProfileScreen -->
     <string name="update_profile_title">Update Profile</string>
     <string name="update_profile_new_avatar">New profile picture</string>
     <string name="update_profile_pick_image">Choose from gallery</string>
     <string name="update_profile_name_label">New display name</string>
     <string name="update_profile_save">Save</string>
+
     <!--     ui/screens/DownloadedMusicScreen -->
     <string name="download_title">Downloads</string>
     <string name="download_empty_title">No downloaded songs yet</string>
@@ -87,10 +98,14 @@
     <string name="action_close">Close</string>
     <string name="download_search_placeholder">Search downloads…</string>
     <string name="download_search_result_title">Search results"</string>
+    <string name="download_delete_song">Delete song</string>
+
+
     <!--     data/repository/AuthRepository -->
     <string name="sign_up_success">Account created successfully</string>
     <string name="sign_up_error">Registration failed</string>
     <string name="login_success">Logged in successfully</string>
     <string name="login_error_failed">Login failed</string>
     <string name="login_error_reset_failed">Failed to send reset link</string>
+
 </resources>

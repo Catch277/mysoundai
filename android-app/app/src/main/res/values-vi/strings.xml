@@ -10,6 +10,14 @@
     <string name="home_title_suggested">Gợi ý cho bạn</string>
     <string name="home_title_search_results">Kết quả tìm kiếm</string>
     <string name="home_title_featured">Playlist nổi bật</string>
+    <string name="msg_download_success">Đã tải xuống: %1$s</string>
+    <string name="msg_download_failed">Lỗi khi tải xuống %1$s. Vui lòng thử lại!</string>
+    <string name="msg_song_already_exists">Bài hát đã tải xuống!.</string>
+    <string name="msg_song_deleted">Đã xóa: %1$s</string>
+    <string name="msg_download_cancelled">Đã hủy tải xuống: %1$s</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="retry_download">Tải xuống lại</string>
+
     <!--     ui/navigation/NavigationItem -->
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Khám phá</string>
@@ -87,6 +95,8 @@
     <string name="action_close">Đóng</string>
     <string name="download_search_placeholder">Tìm trong bài đã tải…</string>
     <string name="download_search_result_title">Kết quả tìm kiếm"</string>
+    <string name="download_delete_song">Xóa bài hát</string>
+
     <!--     data/repository/AuthRepository -->
     <string name="sign_up_success">Đăng ký thành công</string>
     <string name="sign_up_error">Đăng ký thất bại</string>

@@ -33,10 +33,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
+import com.example.mysoundai.core.util.UiText
+import com.example.mysoundai.domain.model.DownloadState
+import com.example.mysoundai.ui.components.ToastMessage
+import com.example.mysoundai.ui.viewmodel.DownloadUiEvent
+import com.example.mysoundai.ui.viewmodel.DownloadViewModel
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
+fun HomeScreen(viewModel: HomeViewModel,
+               downloadViewModel: DownloadViewModel,
+               paddingValues: PaddingValues) {
     val songs = viewModel.songList.value
     val isLoading = viewModel.isLoading.value
     val scope = rememberCoroutineScope()
@@ -46,6 +53,27 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
     val searchBarAlpha by remember {
         derivedStateOf {
             if (scrollState.firstVisibleItemIndex > 0) 0.7f else 1f
+        }
+    }
+
+    val downloadStates by downloadViewModel.downloadStates.collectAsState()
+    var toastMessage by remember { mutableStateOf<UiText?>(null) }
+    var toastTrigger by remember { mutableIntStateOf(0) }
+
+    LaunchedEffect(Unit) {
+        downloadViewModel.uiEvent.collect { event ->
+            when (event) {
+                is DownloadUiEvent.ShowToast -> {
+                    toastMessage = event.message
+                    toastTrigger++
+                }
+            }
+        }
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            downloadViewModel.resetCancelledStates()
         }
     }
 
@@ -112,7 +140,16 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
                         HomeRowTitle(title = titleText)
                     }
                     items(viewModel.filteredSongs) { song ->
-                        SongItem(song = song)
+                        val state = downloadStates[song.id] ?: DownloadState.Idle
+                        SongItem(song = song,
+                                 state = state,
+                                 onDownloadClick = {
+                                     downloadViewModel.downloadSong(song)
+                                 },
+                                 onCancelClick = {
+                                     downloadViewModel.cancelDownload(song)
+                                 }
+                        )
                     }
                     if (viewModel.filteredSongs.isEmpty() && viewModel.searchQuery.isNotEmpty()) {
                         item {
@@ -137,11 +174,26 @@ fun HomeScreen(viewModel: HomeViewModel, paddingValues: PaddingValues) {
                         HomeRowTitle(titleSuggested)
                     }
                     items(songs) { song ->
-                        SongItem(song = song)
+                        val state = downloadStates[song.id] ?: DownloadState.Idle
+                        SongItem(song = song,
+                                 state = state,
+                                  onDownloadClick = {
+                                    downloadViewModel.downloadSong(song)
+                                },
+                            onCancelClick = {
+                                downloadViewModel.cancelDownload(song)
+                            }
+                        )
                     }
                 }
             }
-
+        }
+        toastMessage?.let { text ->
+            ToastMessage(
+                message = text.asString(),
+                trigger = toastTrigger,
+                onDismiss = { toastMessage = null }
+            )
         }
     }
 }
@@ -217,8 +269,8 @@ fun HomeHeader() {
     val greeting = remember {
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
         when (hour) {
-            in 5..12 -> morning
-            in 13..18 -> afternoon
+            in 5..11 -> morning
+            in 12..18 -> afternoon
             in 19..23 -> evening
             else -> night
         }

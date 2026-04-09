@@ -8,9 +8,12 @@ import com.example.mysoundai.data.repository.MusicRepositoryImpl
 import com.example.mysoundai.domain.repository.MusicRepository
 import com.google.firebase.auth.FirebaseAuth
 import androidx.core.content.edit
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
 import com.example.mysoundai.data.local.room.AppDatabase
 import com.example.mysoundai.data.repository.DownloadRepository
+import com.example.mysoundai.ui.viewmodel.DownloadViewModel
 
 object AppContainer {
     lateinit var themePreference: ThemePreference
@@ -54,5 +57,11 @@ object AppContainer {
 
     val downloadRepository: DownloadRepository by lazy {
         DownloadRepository(database.songDao(), appContext)
+    }
+
+    val Factory = viewModelFactory {
+        initializer {
+            DownloadViewModel(repository = downloadRepository)
+        }
     }
 }

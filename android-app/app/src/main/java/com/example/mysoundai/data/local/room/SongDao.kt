@@ -16,4 +16,8 @@ interface SongDao {
 
     @Query("DELETE FROM downloaded_songs WHERE songId = :id")
     suspend fun deleteSongById(id: String)
+
+    @Query("SELECT EXISTS(SELECT 1 FROM downloaded_songs WHERE songId = :id)")
+    suspend fun isSongDownloaded(id: String): Boolean
+
 }

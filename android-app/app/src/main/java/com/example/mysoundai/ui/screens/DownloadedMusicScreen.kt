@@ -33,11 +33,15 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.mysoundai.R
-import com.example.mysoundai.domain.model.Song
 import com.example.mysoundai.ui.components.SongItem
 import kotlinx.coroutines.delay
 import androidx.compose.foundation.lazy.items
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.compose.material.icons.filled.Delete
+import com.example.mysoundai.core.util.UiText
+import com.example.mysoundai.data.local.room.toDomain
+import com.example.mysoundai.domain.model.DownloadState
+import com.example.mysoundai.ui.components.ToastMessage
+import com.example.mysoundai.ui.viewmodel.DownloadUiEvent
 import com.example.mysoundai.ui.viewmodel.DownloadViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -47,6 +51,10 @@ fun DownloadedMusicScreen(
     onNavigateToExplore: () -> Unit,
     onBack: () -> Unit
 ) {
+    var toastMessage by remember { mutableStateOf<UiText?>(null) }
+    var toastTrigger by remember { mutableIntStateOf(0) }
+
+    val downloadStates by viewModel.downloadStates.collectAsState()
     val downloadedSongs by viewModel.downloadedSongs.collectAsState()
     var showSearch by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
@@ -72,85 +80,97 @@ fun DownloadedMusicScreen(
             keyboardController?.show()
         }
     }
+    LaunchedEffect(Unit) {
+        viewModel.uiEvent.collect { event ->
+            when (event) {
+                is DownloadUiEvent.ShowToast -> {
+                    toastMessage = event.message
+                    toastTrigger++
+                }
+            }
+        }
+    }
     Scaffold(
         topBar = {
-            CenterAlignedTopAppBar(
-                title = {
-                    AnimatedVisibility(
-                        visible = !showSearch,
-                        enter = fadeIn(),
-                        exit = fadeOut()
-                    ) {
-                        Text(
-                            stringResource(R.string.download_title),
-                            style = MaterialTheme.typography.titleLarge,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                },
-                navigationIcon = {
-                    if (!showSearch) {
-                        IconButton(onClick = { onBack() }) {
-                            Icon(
-                                Icons.AutoMirrored.Filled.ArrowBack,
-                                contentDescription = stringResource(R.string.action_back)
+            Column {
+                CenterAlignedTopAppBar(
+                    title = {
+                        AnimatedVisibility(
+                            visible = !showSearch,
+                            enter = fadeIn(),
+                            exit = fadeOut()
+                        ) {
+                            Text(
+                                stringResource(R.string.download_title),
+                                style = MaterialTheme.typography.titleLarge,
+                                fontWeight = FontWeight.Bold
                             )
                         }
-                    }
-                },
-                actions = {
-                    if (!showSearch) {
-                        IconButton(onClick = { showSearch = true }) {
-                            Icon(
-                                imageVector = Icons.Default.Search,
-                                contentDescription = stringResource(R.string.action_search)
-                            )
-                        }
-                    }
-                },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                )
-            )
-            AnimatedVisibility(
-                visible = showSearch,
-                enter = expandVertically() + fadeIn(),
-                exit = shrinkVertically() + fadeOut()
-            ) {
-                OutlinedTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = {
-                        Text(searchPlaceholder, color = Color.Gray)},
-                    leadingIcon = {
-                        Icon(Icons.Default.Search, contentDescription = null,
-                            tint = Color.Gray)
                     },
-                    trailingIcon = {
-                        if (searchQuery.isNotEmpty()) {
-                            IconButton(onClick = { searchQuery = "" }) {
-                                Icon(Icons.Default.Close, contentDescription = null)
+                    navigationIcon = {
+                        if (!showSearch) {
+                            IconButton(onClick = { onBack() }) {
+                                Icon(
+                                    Icons.AutoMirrored.Filled.ArrowBack,
+                                    contentDescription = stringResource(R.string.action_back)
+                                )
                             }
                         }
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .focusRequester(searchFocusRequester),
-                    singleLine = true,
-                    keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
-                    shape = RoundedCornerShape(25.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.primary,
-                        unfocusedBorderColor = Color.Gray
+                    actions = {
+                        if (!showSearch) {
+                            IconButton(onClick = { showSearch = true }) {
+                                Icon(
+                                    imageVector = Icons.Default.Search,
+                                    contentDescription = stringResource(R.string.action_search)
+                                )
+                            }
+                        }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
                     )
                 )
+                AnimatedVisibility(
+                    visible = showSearch,
+                    enter = expandVertically() + fadeIn(),
+                    exit = shrinkVertically() + fadeOut()
+                ) {
+                    OutlinedTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = {
+                            Text(searchPlaceholder, color = Color.Gray)},
+                        leadingIcon = {
+                            Icon(Icons.Default.Search, contentDescription = null,
+                                tint = Color.Gray)
+                        },
+                        trailingIcon = {
+                            if (searchQuery.isNotEmpty()) {
+                                IconButton(onClick = { searchQuery = "" }) {
+                                    Icon(Icons.Default.Close, contentDescription = null)
+                                }
+                            }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .focusRequester(searchFocusRequester),
+                        singleLine = true,
+                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+                        shape = RoundedCornerShape(25.dp),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = MaterialTheme.colorScheme.primary,
+                            unfocusedBorderColor = Color.Gray
+                        )
+                    )
+                }
             }
         }
     ) { padding ->
         Box(
-            modifier = Modifier.
-            fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
                 .padding(padding)
                 .background(MaterialTheme.colorScheme.background)
                 .pointerInput(showSearch) {
@@ -164,36 +184,6 @@ fun DownloadedMusicScreen(
                 }
         ) {
             when {
-                searchQuery.isNotEmpty() && filteredSongs.isEmpty() -> {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = null,
-                            modifier = Modifier.size(80.dp),
-                            tint = MaterialTheme.colorScheme.primary.copy(0.3f)
-                        )
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            stringResource(R.string.download_search_result_title),
-                            style = MaterialTheme.typography.titleLarge,
-                            textAlign = TextAlign.Center,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Spacer(modifier = Modifier.height(18.dp))
-                        Text(
-                            text = noResultsText,
-                            style = MaterialTheme.typography.bodyMedium,
-                            textAlign = TextAlign.Center,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                }
                 downloadedSongs.isEmpty() -> {
                     Column(
                         modifier = Modifier
@@ -229,44 +219,93 @@ fun DownloadedMusicScreen(
                                 containerColor = MaterialTheme.colorScheme.primary
                             ),
                             shape = MaterialTheme.shapes.extraLarge,
-                            modifier = Modifier.height(56.dp).fillMaxWidth(0.7f)
+                            modifier = Modifier
+                                .height(56.dp)
+                                .fillMaxWidth(0.7f)
                         ) {
                             Text(
                                 stringResource(R.string.download_explore_btn),
                                 fontWeight = FontWeight.Bold
                             )
                         }
+                    }
+                }
+                searchQuery.isNotEmpty() && filteredSongs.isEmpty() -> {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(32.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = null,
+                            modifier = Modifier.size(80.dp),
+                            tint = MaterialTheme.colorScheme.primary.copy(0.3f)
+                        )
                         Spacer(modifier = Modifier.height(16.dp))
-                        Button(
-                            onClick = {
-                                val randomId = "test_${System.currentTimeMillis()}"
-                                viewModel.downloadSong(
-                                    songId = randomId,
-                                    title = "Bài hát Test $randomId",
-                                    artist = "Ca sĩ Test",
-                                    duration = 240000L
-                                )
-                            },
-                            colors = ButtonDefaults.buttonColors(containerColor = Color.Red.copy(alpha = 0.8f)),
-                            shape = MaterialTheme.shapes.extraLarge,
-                            modifier = Modifier.height(56.dp).fillMaxWidth(0.7f)
-                        ) {
-                            Text("Test Insert Room DB", fontWeight = FontWeight.Bold, color = Color.White)
-                        }
+                        Text(
+                            stringResource(R.string.download_search_result_title),
+                            style = MaterialTheme.typography.titleLarge,
+                            textAlign = TextAlign.Center,
+                            fontWeight = FontWeight.Bold
+                        )
+                        Spacer(modifier = Modifier.height(18.dp))
+                        Text(
+                            text = noResultsText,
+                            style = MaterialTheme.typography.bodyMedium,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
                 else -> {
                     LazyColumn(modifier = Modifier.fillMaxSize()) {
-                        items(items = filteredSongs) { downloadedSong ->
-                            val uiSong = Song(
-                                id = downloadedSong.songId,
-                                title = downloadedSong.title,
-                                artist = downloadedSong.artist,
-                                duration = downloadedSong.duration,
-                                imageUrl = downloadedSong.coverPath ?: "",
-                                audioUrl = downloadedSong.filePath
-                            )
-                            SongItem(song = uiSong)
+                        items(items = filteredSongs, key = { it.songId }) { downloadedSong ->
+                            val uiSong = downloadedSong.toDomain()
+                            val state = downloadStates[downloadedSong.songId] ?: DownloadState.Completed
+                            val dismissState = rememberSwipeToDismissBoxState()
+                            LaunchedEffect(dismissState.currentValue) {
+                                if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
+                                    viewModel.deleteDownloadedSong(downloadedSong)
+                                }
+                            }
+                            SwipeToDismissBox(
+                                state = dismissState,
+                                enableDismissFromStartToEnd = false,
+                                backgroundContent = {
+                                    val color = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
+                                        Color.Red.copy(alpha = 0.8f)
+                                    } else {
+                                        Color.Transparent
+                                    }
+                                    Box(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .background(color)
+                                            .padding(horizontal = 20.dp),
+                                        contentAlignment = Alignment.CenterEnd
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Delete,
+                                            contentDescription = stringResource(R.string.download_delete_song),
+                                            tint = Color.White
+                                        )
+                                    }
+                                }
+                            ) {
+                                SongItem(
+                                    song = uiSong,
+                                    state = state,
+                                    onDownloadClick = {
+                                        viewModel.downloadSong(uiSong)
+                                    },
+                                    onCancelClick = {
+                                        viewModel.cancelDownload(uiSong)
+                                    }
+                                )
+                            }
                             HorizontalDivider(
                                 modifier = Modifier
                                     .padding(horizontal = 16.dp)
@@ -275,6 +314,13 @@ fun DownloadedMusicScreen(
                         }
                     }
                 }
+            }
+            toastMessage?.let { text ->
+                ToastMessage(
+                    message = text.asString(),
+                    trigger = toastTrigger,
+                    onDismiss = { toastMessage = null }
+                )
             }
         }
     }
