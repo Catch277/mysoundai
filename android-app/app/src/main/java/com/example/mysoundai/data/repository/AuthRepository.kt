@@ -1,6 +1,8 @@
 package com.example.mysoundai.data.repository
 
+import android.content.Context
 import android.net.Uri
+import com.example.mysoundai.R
 import com.example.mysoundai.data.model.UserData
 import com.google.firebase.Firebase
 import com.google.firebase.auth.FirebaseAuth
@@ -12,7 +14,9 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
-class AuthRepository(private val auth: FirebaseAuth) {
+class AuthRepository(private val auth: FirebaseAuth,
+                    private val context: Context
+) {
     private val firestore = Firebase.firestore
 
     fun getCurrentUser(): UserData? {
@@ -68,17 +72,17 @@ class AuthRepository(private val auth: FirebaseAuth) {
     } catch (e: Exception) { Result.failure(e) }
 
     suspend fun signInWithGoogle(idToken: String): Result<UserData?> {
-        return Result.failure(Exception("ERROR_GOOGLE_SDK_NOT_CONFIGURED"))
+        return Result.failure(Exception(context.getString(R.string.error_google_sdk_not_configured)))
     }
 
     suspend fun signInWithFacebook(accessToken: String): Result<UserData?> {
-        return Result.failure(Exception("ERROR_FACEBOOK_SDK_NOT_CONFIGURED"))
+        return Result.failure(Exception(context.getString(R.string.error_facebook_sdk_not_configured)))
     }
 
     suspend fun updateProfile(displayName: String? = null, photoUri: Uri? = null): Result<UserData?> {
         return try {
             val user = auth.currentUser
-                ?: return Result.failure(Exception("ERROR_NOT_LOGGED_IN"))
+                ?: return Result.failure(Exception(context.getString(R.string.error_not_logged_in)))
             val profileUpdates = userProfileChangeRequest {
                 displayName?.let { name -> this.displayName = name }
                 photoUri?.let { uri -> this.photoUri = uri }
@@ -102,13 +106,13 @@ class AuthRepository(private val auth: FirebaseAuth) {
                 .await()
             Result.success(Unit)
         } else {
-            Result.failure(Exception("ERROR_NOT_LOGGED_IN"))
+            Result.failure(Exception(context.getString(R.string.error_not_logged_in)))
         }
     } catch (e: Exception) { Result.failure(e) }
 
     suspend fun getUserSettings(): Result<Map<String, Any>?> = try {
         val uid = auth.currentUser?.uid
-            ?: return Result.failure(Exception("ERROR_NOT_LOGGED_IN"))
+            ?: return Result.failure(Exception(context.getString(R.string.error_not_logged_in)))
             val snapshot = firestore.collection("users")
                 .document(uid).get().await()
             Result.success(snapshot.data)

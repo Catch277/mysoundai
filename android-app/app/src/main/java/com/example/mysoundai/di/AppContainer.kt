@@ -8,24 +8,28 @@ import com.example.mysoundai.data.repository.MusicRepositoryImpl
 import com.example.mysoundai.domain.repository.MusicRepository
 import com.google.firebase.auth.FirebaseAuth
 import androidx.core.content.edit
-import androidx.lifecycle.viewmodel.initializer
-import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.room.Room
 import com.example.mysoundai.data.local.room.AppDatabase
 import com.example.mysoundai.data.repository.DownloadRepository
-import com.example.mysoundai.ui.viewmodel.DownloadViewModel
+import com.example.mysoundai.service.MusicController
+import okhttp3.OkHttpClient
 
 object AppContainer {
     lateinit var themePreference: ThemePreference
         private set
     lateinit var languagePreference: LanguagePreference
         private set
-    private lateinit var appContext: Context
+    private var appContext: Context? = null
+    private val ctx get() = appContext
+        ?: error("AppContainer.init(context) must be called before accessing any property")
+    private val okHttpClient: OkHttpClient by lazy {
+        OkHttpClient.Builder().build()
+    }
 
     fun init(context: Context) {
+        appContext = context.applicationContext
         themePreference = ThemePreference(context)
         languagePreference = LanguagePreference(context)
-        appContext = context.applicationContext
     }
 
     val musicRepository: MusicRepository by lazy {
@@ -33,7 +37,11 @@ object AppContainer {
     }
 
     val authRepository: AuthRepository by lazy {
-        AuthRepository(firebaseAuth)
+        AuthRepository(firebaseAuth, ctx)
+    }
+
+    val musicController: MusicController by lazy {
+        MusicController(ctx)
     }
 
     private val firebaseAuth: FirebaseAuth by lazy {
@@ -41,13 +49,13 @@ object AppContainer {
     }
 
     fun saveLanguageSync(langCode: String) {
-        val prefs = appContext.getSharedPreferences("lang_prefs", Context.MODE_PRIVATE)
+        val prefs = ctx.getSharedPreferences("lang_prefs", Context.MODE_PRIVATE)
         prefs.edit { putString("language_code", langCode) }
     }
 
     val database: AppDatabase by lazy {
         Room.databaseBuilder(
-            appContext,
+            ctx,
             AppDatabase::class.java,
             "mysoundai_db"
         )
@@ -56,12 +64,8 @@ object AppContainer {
     }
 
     val downloadRepository: DownloadRepository by lazy {
-        DownloadRepository(database.songDao(), appContext)
-    }
-
-    val Factory = viewModelFactory {
-        initializer {
-            DownloadViewModel(repository = downloadRepository)
-        }
+        DownloadRepository(songDao = database.songDao(),
+                           context = ctx,
+                           okHttpClient = okHttpClient)
     }
 }

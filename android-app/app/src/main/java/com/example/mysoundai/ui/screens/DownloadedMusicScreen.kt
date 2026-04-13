@@ -43,11 +43,13 @@ import com.example.mysoundai.domain.model.DownloadState
 import com.example.mysoundai.ui.components.ToastMessage
 import com.example.mysoundai.ui.viewmodel.DownloadUiEvent
 import com.example.mysoundai.ui.viewmodel.DownloadViewModel
+import com.example.mysoundai.ui.viewmodel.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DownloadedMusicScreen(
     viewModel: DownloadViewModel,
+    playerViewModel: PlayerViewModel,
     onNavigateToExplore: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -265,12 +267,14 @@ fun DownloadedMusicScreen(
                         items(items = filteredSongs, key = { it.songId }) { downloadedSong ->
                             val uiSong = downloadedSong.toDomain()
                             val state = downloadStates[downloadedSong.songId] ?: DownloadState.Completed
-                            val dismissState = rememberSwipeToDismissBoxState()
-                            LaunchedEffect(dismissState.currentValue) {
-                                if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart) {
-                                    viewModel.deleteDownloadedSong(downloadedSong)
+                            val dismissState = rememberSwipeToDismissBoxState(
+                                confirmValueChange = { value ->
+                                    if (value == SwipeToDismissBoxValue.EndToStart) {
+                                        viewModel.deleteDownloadedSong(downloadedSong)
+                                        true
+                                    } else false
                                 }
-                            }
+                            )
                             SwipeToDismissBox(
                                 state = dismissState,
                                 enableDismissFromStartToEnd = false,
@@ -303,6 +307,13 @@ fun DownloadedMusicScreen(
                                     },
                                     onCancelClick = {
                                         viewModel.cancelDownload(uiSong)
+                                    },
+                                    onItemClick = {
+                                        playerViewModel.playAudio(
+                                            song = uiSong,
+                                            isOffline = true,
+                                            localPath = downloadedSong.filePath
+                                        )
                                     }
                                 )
                             }

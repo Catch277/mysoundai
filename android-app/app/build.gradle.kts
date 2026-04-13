@@ -41,6 +41,12 @@ android {
 }
 
 dependencies {
+    //Media3 Exoplayer
+    val media3Version = "1.10.0" // Phiên bản ổn định mới nhất hiện tại
+    implementation("androidx.media3:media3-exoplayer:$media3Version")
+    implementation("androidx.media3:media3-session:$media3Version")
+    implementation("androidx.media3:media3-ui:$media3Version")
+
     implementation("com.google.android.material:material:1.13.0")
     implementation("androidx.datastore:datastore-preferences:1.2.1")
     implementation(platform("com.google.firebase:firebase-bom:33.7.0"))

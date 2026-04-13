@@ -1,33 +1,34 @@
 <resources>
     <string name="app_name">MySoundAI</string>
-    <!--     ui/screens.HomeScreen -->
-    <string name="home_greeting_morning">Chào buổi sáng</string>
-    <string name="home_greeting_afternoon">Chào buổi chiều</string>
-    <string name="home_greeting_evening">Chào buổi tối</string>
-    <string name="home_greeting_night">Ngủ ngon cùng playlist của bạn</string>
-    <string name="home_search_placeholder">Bạn muốn nghe gì?</string>
-    <string name="home_search_no_results">Không tìm thấy kết quả cho \'%1$s\'</string>
-    <string name="home_title_suggested">Gợi ý cho bạn</string>
-    <string name="home_title_search_results">Kết quả tìm kiếm</string>
-    <string name="home_title_featured">Playlist nổi bật</string>
-    <string name="msg_download_success">Đã tải xuống: %1$s</string>
-    <string name="msg_download_failed">Lỗi khi tải xuống %1$s. Vui lòng thử lại!</string>
-    <string name="msg_song_already_exists">Bài hát đã tải xuống!.</string>
-    <string name="msg_song_deleted">Đã xóa: %1$s</string>
-    <string name="msg_download_cancelled">Đã hủy tải xuống: %1$s</string>
-    <string name="action_cancel">Hủy</string>
-    <string name="retry_download">Tải xuống lại</string>
-
     <!--     ui/navigation/NavigationItem -->
     <string name="nav_home">Trang chủ</string>
     <string name="nav_search">Khám phá</string>
     <string name="nav_library">Thư viện</string>
-    <string name="nav_profile">Cá nhân</string>
+    <string name="nav_profile">Hồ sơ</string>
     <string name="nav_register">Đăng ký</string>
     <string name="nav_login">Đăng nhập</string>
     <string name="nav_settings">Cài đặt</string>
     <string name="nav_update_profile">Cập nhật hồ sơ</string>
-    <string name="nav_downloads">Đã tải</string>
+    <string name="nav_downloads">Đã tải về</string>
+    <!--     ui/screens/HomeScreen -->
+    <string name="home_greeting_morning">Chào buổi sáng</string>
+    <string name="home_greeting_afternoon">Chào buổi chiều</string>
+    <string name="home_greeting_evening">Chào buổi tối</string>
+    <string name="home_greeting_night">Ngủ ngon cùng danh sách phát yêu thích của bạn</string>
+    <string name="home_search_placeholder">Bạn muốn nghe gì?</string>
+    <string name="home_search_no_results">Không tìm thấy kết quả cho \'%1$s\'</string>
+    <string name="home_title_suggested">Gợi ý cho bạn</string>
+    <string name="home_title_search_results">Kết quả tìm kiếm</string>
+    <string name="home_title_all_song">Tất cả bài hát</string>
+    <string name="home_title_featured">Playlist nổi bật</string>
+    <string name="msg_download_success">Đã tải xuống: %1$s</string>
+    <string name="msg_download_failed">Tải xuống %1$s thất bại. Vui lòng thử lại!</string>
+    <string name="msg_song_already_exists">Bài hát đã được tải xuống.</string>
+    <string name="msg_song_deleted">Đã xóa: %1$s</string>
+    <string name="msg_download_cancelled">Đã hủy tải xuống: %1$s</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="retry_download">Thử tải lại</string>
+
     <!--     ui/screens/LoginScreen -->
     <string name="login_title">Đăng nhập</string>
     <string name="login_password_label">Mật khẩu</string>
@@ -36,16 +37,16 @@
     <string name="login_button">Đăng nhập</string>
     <string name="login_no_account">Chưa có tài khoản? Đăng ký ngay</string>
     <string name="action_back">Quay lại</string>
-    <string name="login_error_email_and_password">Vui lòng nhập email và mật khẩu!</string>
-    <string name="login_error_email_empty">Vui lòng nhập email!</string>
-    <string name="login_error_password_empty">Vui lòng nhập mật khẩu!</string>
+    <string name="login_error_email_and_password">Vui lòng nhập email và mật khẩu</string>
+    <string name="login_error_email_empty">Vui lòng nhập email</string>
+    <string name="login_error_password_empty">Vui lòng nhập mật khẩu</string>
     <string name="login_error_password_short">Mật khẩu phải có ít nhất 6 ký tự</string>
-    <string name="login_reset_sent">Đã gửi link reset mật khẩu đến email của bạn!</string>
-    <string name="login_error_email_required_for_reset">Vui lòng nhập email của bạn!</string>
+    <string name="login_reset_sent">Đã gửi link đặt lại mật khẩu đến email của bạn</string>
+    <string name="login_error_email_required_for_reset">Vui lòng nhập email trước</string>
     <!--     ui/screens/ProfileScreen -->
-    <string name="profile_title">Cá nhân</string>
-    <string name="profile_login_prompt">Đăng nhập để lưu ngay danh sách phát của bạn</string>
-    <string name="profile_login_email">Đăng nhập / Đăng ký với Email</string>
+    <string name="profile_title">Hồ sơ</string>
+    <string name="profile_login_prompt">Đăng nhập để lưu danh sách nhạc của bạn</string>
+    <string name="profile_login_email">Đăng nhập / Đăng ký bằng Email</string>
     <string name="profile_or">hoặc</string>
     <string name="profile_login_google">Tiếp tục với Google</string>
     <string name="profile_login_facebook">Tiếp tục với Facebook</string>
@@ -56,20 +57,19 @@
     <!--     ui/screens/RegisterScreen -->
     <string name="register_title">Tạo tài khoản</string>
     <string name="register_button">Đăng ký</string>
-    <!--  reuses login_password_label, login_toggle_password,
-             login_error_* and action_back from LoginScreen  -->
+
     <!--     ui/screens/SettingsScreen -->
     <string name="settings_title">Cài đặt</string>
     <string name="settings_login_hint">Vui lòng đăng nhập để tùy chỉnh</string>
     <string name="settings_profile">Hồ sơ</string>
-    <string name="settings_profile_desc">Thay đổi tên hiển thị, ảnh đại diện</string>
+    <string name="settings_profile_desc">Đổi tên hiển thị, ảnh đại diện</string>
     <string name="settings_theme">Giao diện</string>
     <string name="settings_theme_desc">Chế độ hiện tại: %1$s</string>
     <string name="settings_theme_dialog_title">Chọn chế độ giao diện</string>
-    <string name="settings_theme_changed">Đã chuyển sang chế độ</string>
+    <string name="settings_theme_changed">Đã chuyển sang</string>
     <string name="settings_language">Ngôn ngữ</string>
     <string name="settings_language_current">Tiếng Việt</string>
-    <string name="settings_downloads">Đã tải</string>
+    <string name="settings_downloads">Tải về</string>
     <string name="settings_downloads_desc">Quản lý nhạc ngoại tuyến</string>
     <string name="theme_light">Sáng</string>
     <string name="theme_dark">Tối</string>
@@ -78,29 +78,40 @@
     <string name="settings_lang_changed">Đã đổi ngôn ngữ</string>
     <string name="lang_vietnamese">Tiếng Việt</string>
     <string name="lang_english">English</string>
+
     <!--     ui/screens/UpdateProfileScreen -->
     <string name="update_profile_title">Cập nhật hồ sơ</string>
     <string name="update_profile_new_avatar">Ảnh đại diện mới</string>
-    <string name="update_profile_pick_image">Chọn ảnh từ thư viện ảnh</string>
-    <string name="update_profile_name_label">Tên người dùng mới</string>
-    <string name="update_profile_save">Lưu cập nhật</string>
+    <string name="update_profile_pick_image">Chọn từ thư viện ảnh</string>
+    <string name="update_profile_name_label">Tên hiển thị mới</string>
+    <string name="update_profile_save">Lưu</string>
+
     <!--     ui/screens/DownloadedMusicScreen -->
-    <string name="download_title">Đã tải</string>
-    <string name="download_empty_title">Chưa có bài hát nào được tải xuống</string>
-    <string name="download_empty_desc">Các bài hát bạn tải về để nghe ngoại tuyến sẽ xuất hiện tại đây.</string>
-    <string name="download_explore_btn">Đi đến Khám phá</string>
+    <string name="download_title">Đã tải về</string>
+    <string name="download_empty_title">Chưa có bài hát nào được tải</string>
+    <string name="download_empty_desc">Những bài hát bạn tải về để nghe ngoại tuyến sẽ xuất hiện ở đây.</string>
+    <string name="download_explore_btn">Khám phá ngay</string>
     <string name="download_delete_success">Đã xóa %s thành công</string>
-    <string name="download_search_hint">Tìm trong danh sách tải…</string>
+    <string name="download_search_hint">Tìm trong nhạc đã tải…</string>
     <string name="action_search">Tìm kiếm</string>
     <string name="action_close">Đóng</string>
-    <string name="download_search_placeholder">Tìm trong bài đã tải…</string>
-    <string name="download_search_result_title">Kết quả tìm kiếm"</string>
+    <string name="download_search_placeholder">Tìm kiếm nhạc đã tải…</string>
+    <string name="download_search_result_title">Kết quả tìm kiếm</string>
     <string name="download_delete_song">Xóa bài hát</string>
 
     <!--     data/repository/AuthRepository -->
-    <string name="sign_up_success">Đăng ký thành công</string>
+    <string name="sign_up_success">Tạo tài khoản thành công</string>
     <string name="sign_up_error">Đăng ký thất bại</string>
     <string name="login_success">Đăng nhập thành công</string>
     <string name="login_error_failed">Đăng nhập thất bại</string>
-    <string name="login_error_reset_failed">Gửi link thất bại</string>
+    <string name="login_error_reset_failed">Gửi link đặt lại mật khẩu thất bại</string>
+    <string name="error_google_sdk_not_configured">Google SDK chưa được cấu hình</string>
+    <string name="error_facebook_sdk_not_configured">Facebook SDK chưa được cấu hình</string>
+    <string name="error_not_logged_in">Người dùng chưa đăng nhập</string>
+
+    <!--     data/repository/DownloadRepository -->
+    <string name="error_invalid_audio_url">Đường dẫn âm thanh không hợp lệ</string>
+    <string name="error_server_code">Lỗi máy chủ: %1$d</string>
+    <string name="error_no_music_data">Không thể tải dữ liệu âm nhạc</string>
+    <string name="error_network_or_system">Lỗi mạng hoặc hệ thống</string>
 </resources>

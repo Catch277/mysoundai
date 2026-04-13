@@ -1,5 +1,6 @@
 package com.example.mysoundai.ui.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -34,10 +35,12 @@ import com.example.mysoundai.domain.model.DownloadState
 fun SongItem(song: Song,
              state: DownloadState = DownloadState.Idle,
              onDownloadClick: () -> Unit,
-             onCancelClick: () -> Unit) {
+             onCancelClick: () -> Unit = {},
+             onItemClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxSize()
+            .clickable { onItemClick() }
             .padding(8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {

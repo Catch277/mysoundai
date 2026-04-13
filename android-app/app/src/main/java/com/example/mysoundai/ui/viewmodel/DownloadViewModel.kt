@@ -126,4 +126,13 @@ class DownloadViewModel(private val repository: DownloadRepository) : ViewModel(
             }
         }
     }
+    fun resetFailedStates() {
+        _downloadStates.update { currentMap ->
+            currentMap.mapValues { (_, state) ->
+                if (state is DownloadState.Failed)
+                    DownloadState.Idle
+                else state
+            }
+        }
+    }
 }

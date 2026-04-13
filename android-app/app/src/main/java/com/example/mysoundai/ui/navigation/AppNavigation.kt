@@ -20,6 +20,7 @@ import com.example.mysoundai.ui.screens.RegisterScreen
 import com.example.mysoundai.ui.screens.SettingsScreen
 import com.example.mysoundai.ui.screens.UpdateProfileScreen
 import com.example.mysoundai.ui.viewmodel.DownloadViewModel
+import com.example.mysoundai.ui.viewmodel.PlayerViewModel
 
 @Composable
 fun AppNavigation(
@@ -27,6 +28,7 @@ fun AppNavigation(
     homeViewModel: HomeViewModel,
     authViewModel: AuthViewModel,
     downloadViewModel: DownloadViewModel,
+    playerViewModel: PlayerViewModel,
     paddingValues: PaddingValues
 ) {
     NavHost(
@@ -39,6 +41,7 @@ fun AppNavigation(
         composable(Screen.Home.route) {
             HomeScreen(viewModel = homeViewModel,
                 downloadViewModel = downloadViewModel,
+                playerViewModel = playerViewModel,
                 paddingValues = paddingValues)
         }
         composable(Screen.Search.route) { /* Khám phá */ }
@@ -101,6 +104,7 @@ fun AppNavigation(
         composable(Screen.Downloads.route) {
             DownloadedMusicScreen(
                 viewModel = downloadViewModel,
+                playerViewModel = playerViewModel,
                 onNavigateToExplore = {
                     navController.navigate(Screen.Home.route)
                 },

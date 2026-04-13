@@ -14,12 +14,13 @@
     <string name="home_greeting_morning">Good morning</string>
     <string name="home_greeting_afternoon">Good afternoon</string>
     <string name="home_greeting_evening">Good evening</string>
-    <string name="home_greeting_night">Sleep while playing your Playlist</string>
+    <string name="home_greeting_night">Sleep while playing your favorite Playlist</string>
     <string name="home_search_placeholder">What do you want to hear?</string>
     <string name="home_search_no_results">No results found for \'%1$s\'</string>
     <string name="home_title_suggested">Suggested for you</string>
     <string name="home_title_search_results">Search results</string>
     <string name="home_title_featured">Featured playlists</string>
+    <string name="home_title_all_song">All songs</string>
     <string name="msg_download_success">Downloaded: %1$s</string>
     <string name="msg_download_failed">Failed to download %1$s. Please try again!</string>
     <string name="msg_song_already_exists">Song is already downloaded.</string>
@@ -100,12 +101,19 @@
     <string name="download_search_result_title">Search results"</string>
     <string name="download_delete_song">Delete song</string>
 
-
     <!--     data/repository/AuthRepository -->
     <string name="sign_up_success">Account created successfully</string>
     <string name="sign_up_error">Registration failed</string>
     <string name="login_success">Logged in successfully</string>
     <string name="login_error_failed">Login failed</string>
     <string name="login_error_reset_failed">Failed to send reset link</string>
+    <string name="error_google_sdk_not_configured">Google SDK is not configured</string>
+    <string name="error_facebook_sdk_not_configured">Facebook SDK is not configured</string>
+    <string name="error_not_logged_in">User is not logged in</string>
 
+    <!--     data/repository/DownloadRepository -->
+    <string name="error_invalid_audio_url">Invalid audio URL</string>
+    <string name="error_server_code">Server error: %1$d</string>
+    <string name="error_no_music_data">Unable to download music data</string>
+    <string name="error_network_or_system">Network or System failed</string>
 </resources>

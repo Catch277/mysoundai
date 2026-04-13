@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
-<uses-permission android:name="android.permission.INTERNET"/>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PLAYBACK" />
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+
     <application
         android:name=".MyApp"
         android:allowBackup="true"
@@ -12,6 +18,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MySoundAI"
         android:usesCleartextTraffic="true">
+
         <service android:name="androidx.appcompat.app.AppLocalesMetadataHolderService"
             android:enabled="false"
             android:exported="false">
@@ -19,13 +26,24 @@
                 android:name="autoStoreLocales"
                 android:value="true"/>
         </service>
+
+        <service android:name=".service.MusicPlaybackService"
+            android:foregroundServiceType="mediaPlayback"
+            android:exported="true"
+            android:stopWithTask="false"
+            tools:ignore="ExportedService,ForegroundServicePermission">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaSessionService"/>
+            </intent-filter>
+        </service>
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/Theme.MySoundAI">
             <intent-filter>
-            <action android:name="android.intent.action.MAIN" />
-            <category android:name="android.intent.category.LAUNCHER" />
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         <intent-filter>
             <action android:name="android.intent.action.VIEW" />

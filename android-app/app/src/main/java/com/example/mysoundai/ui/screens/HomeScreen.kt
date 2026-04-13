@@ -1,5 +1,6 @@
 package com.example.mysoundai.ui.screens
 
+import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Text
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.mysoundai.ui.components.DynamicGradientBox
 import com.example.mysoundai.ui.components.SongCard
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.material.icons.Icons
@@ -29,24 +31,34 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import com.example.mysoundai.R
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import com.example.mysoundai.core.util.UiText
 import com.example.mysoundai.domain.model.DownloadState
+import com.example.mysoundai.ui.components.SongGridItem
 import com.example.mysoundai.ui.components.ToastMessage
 import com.example.mysoundai.ui.viewmodel.DownloadUiEvent
 import com.example.mysoundai.ui.viewmodel.DownloadViewModel
+import com.example.mysoundai.ui.viewmodel.PlayerViewModel
 import kotlinx.coroutines.launch
 
 @Composable
 fun HomeScreen(viewModel: HomeViewModel,
                downloadViewModel: DownloadViewModel,
+               playerViewModel: PlayerViewModel,
                paddingValues: PaddingValues) {
     val songs = viewModel.songList.value
     val isLoading = viewModel.isLoading.value
     val scope = rememberCoroutineScope()
+
+    val focusManager = LocalFocusManager.current
+    val keyboardController = LocalSoftwareKeyboardController.current
 
     val firstSongImageUrl = songs.firstOrNull()?.imageUrl ?: ""
     val scrollState = rememberLazyListState()
@@ -57,6 +69,9 @@ fun HomeScreen(viewModel: HomeViewModel,
     }
 
     val downloadStates by downloadViewModel.downloadStates.collectAsState()
+    val downloadedSongs by downloadViewModel.downloadedSongs.collectAsState()
+    val localPathsMap = downloadedSongs.associate { it.songId to it.filePath }
+
     var toastMessage by remember { mutableStateOf<UiText?>(null) }
     var toastTrigger by remember { mutableIntStateOf(0) }
 
@@ -74,30 +89,40 @@ fun HomeScreen(viewModel: HomeViewModel,
     DisposableEffect(Unit) {
         onDispose {
             downloadViewModel.resetCancelledStates()
+            downloadViewModel.resetFailedStates()
         }
     }
 
     val titleSuggested = stringResource(R.string.home_title_suggested)
+    val titleAllSong = stringResource(R.string.home_title_all_song)
     val titleSearchResults = stringResource(R.string.home_title_search_results)
     val titleFeatured = stringResource(R.string.home_title_featured)
 
-    DynamicGradientBox(imageUrl = firstSongImageUrl, modifier = Modifier.fillMaxSize()) {
+    DynamicGradientBox(imageUrl = firstSongImageUrl,
+                        modifier = Modifier
+                        .fillMaxSize()
+                        .pointerInput(Unit) {
+                            detectTapGestures(onTap = {
+                                    focusManager.clearFocus()
+                                    keyboardController?.hide()
+                                })
+                            }
+    ) {
         if (isLoading) {
             CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
         } else {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-            ) {
+                ) {
                 LazyColumn(
                     state = scrollState,
                     modifier = Modifier.fillMaxSize(),
                     contentPadding = PaddingValues(
                         start = 16.dp,
                         end = 16.dp,
-                        bottom = 80.dp,
-                        top = 16.dp
+                        top = 16.dp,
+                        bottom = paddingValues.calculateBottomPadding() + 16.dp
                     ),
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
@@ -115,23 +140,18 @@ fun HomeScreen(viewModel: HomeViewModel,
                         }
                     }
                     item {
-                        Box(modifier = Modifier.fillMaxSize()) {
-                            Column(modifier = Modifier.fillMaxSize()) {
-                                SearchBarComponent(
-                                    query = viewModel.searchQuery,
-                                    onQueryChange = { viewModel.onSearchQueryChanged(it)
-                                        if (scrollState.firstVisibleItemIndex > 0) {
-                                            scope.launch {
-                                                scrollState.animateScrollToItem(0)
-                                            }
-                                        }
-                                    },
-                                    alpha = searchBarAlpha,
-                                    modifier = Modifier
-                                        .statusBarsPadding()
-                                )
-                            }
-                        }
+                        SearchBarComponent(
+                            query = viewModel.searchQuery,
+                            onQueryChange = { viewModel.onSearchQueryChanged(it)
+                                if (scrollState.firstVisibleItemIndex > 0) {
+                                    scope.launch {
+                                        scrollState.animateScrollToItem(0)
+                                    }
+                                } },
+                            alpha = searchBarAlpha,
+                            modifier = Modifier
+                                .statusBarsPadding()
+                        )
                     }
                     item {
                         val titleText = if (viewModel.searchQuery.isEmpty())
@@ -140,7 +160,13 @@ fun HomeScreen(viewModel: HomeViewModel,
                         HomeRowTitle(title = titleText)
                     }
                     items(viewModel.filteredSongs) { song ->
-                        val state = downloadStates[song.id] ?: DownloadState.Idle
+                        val localSong = downloadedSongs.find { it.songId == song.id }
+                        val state = if (localSong != null) {
+                            DownloadState.Completed
+                        } else {
+                            downloadStates[song.id] ?: DownloadState.Idle
+                        }
+                        val isDownloaded = state is DownloadState.Completed
                         SongItem(song = song,
                                  state = state,
                                  onDownloadClick = {
@@ -148,7 +174,17 @@ fun HomeScreen(viewModel: HomeViewModel,
                                  },
                                  onCancelClick = {
                                      downloadViewModel.cancelDownload(song)
-                                 }
+                                 },
+                                onItemClick = {
+                                    val startIndex = songs.indexOf(song)
+                                    if (startIndex != -1) {
+                                        playerViewModel.playAudioList(
+                                            songs = songs,
+                                            startIndex = startIndex,
+                                            localPaths = localPathsMap
+                                        )
+                                    }
+                                }
                         )
                     }
                     if (viewModel.filteredSongs.isEmpty() && viewModel.searchQuery.isNotEmpty()) {
@@ -171,19 +207,51 @@ fun HomeScreen(viewModel: HomeViewModel,
                         }
                     }
                     item {
-                        HomeRowTitle(titleSuggested)
+                        HomeRowTitle(titleAllSong)
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
-                    items(songs) { song ->
-                        val state = downloadStates[song.id] ?: DownloadState.Idle
-                        SongItem(song = song,
-                                 state = state,
-                                  onDownloadClick = {
-                                    downloadViewModel.downloadSong(song)
-                                },
-                            onCancelClick = {
-                                downloadViewModel.cancelDownload(song)
+
+                    val chunkedSongs = songs.chunked(2)
+
+                    items(chunkedSongs) { rowSongs ->
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                        ) {
+                            for (song in rowSongs) {
+                                val localSong = downloadedSongs.find { it.songId == song.id }
+                                val state = if (localSong != null) {
+                                    DownloadState.Completed
+                                } else {
+                                    downloadStates[song.id] ?: DownloadState.Idle
+                                }
+                                val isDownloaded = state is DownloadState.Completed
+                                SongGridItem(
+                                    modifier = Modifier.weight(1f),
+                                    song = song,
+                                    state = state,
+                                    onDownloadClick = {
+                                        downloadViewModel.downloadSong(song)
+                                    },
+                                    onCancelClick = {
+                                        downloadViewModel.cancelDownload(song)
+                                    },
+                                    onItemClick = {
+                                        val startIndex = songs.indexOf(song)
+                                        if (startIndex != -1) {
+                                            playerViewModel.playAudioList(
+                                                songs = songs,
+                                                startIndex = startIndex,
+                                                localPaths = localPathsMap
+                                            )
+                                        }
+                                    }
+                                )
                             }
-                        )
+                            if (rowSongs.size == 1) {
+                                Spacer(modifier = Modifier.weight(1f))
+                            }
+                        }
                     }
                 }
             }
@@ -204,6 +272,7 @@ fun SearchBarComponent(query:String,
                        alpha: Float,
                        modifier: Modifier = Modifier
 ) {
+    val focusManager = LocalFocusManager.current
 
     TextField(
         value = query,
@@ -212,9 +281,24 @@ fun SearchBarComponent(query:String,
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
             .height(56.dp),
-        placeholder = { Text(stringResource(R.string.home_search_placeholder), color = Color.Gray)},
+        placeholder = { Text(stringResource(R.string.home_search_placeholder), color = Color.DarkGray)},
         leadingIcon = { Icon(Icons.Default.Search, contentDescription = null, tint = Color.Gray) },
+        trailingIcon = {
+            if (query.isNotEmpty()) {
+                IconButton(onClick = { onQueryChange("") }) {
+                    Icon(
+                        Icons.Default.Close,
+                        contentDescription = "Clear Search"
+                    )
+                }
+            }
+        },
         keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search),
+        keyboardActions = KeyboardActions(
+            onSearch = {
+                focusManager.clearFocus()
+            }
+        ),
         colors = TextFieldDefaults.colors(
             focusedContainerColor = Color.White.copy(alpha = alpha),
             unfocusedContainerColor = Color.White.copy(alpha = alpha),
@@ -229,7 +313,7 @@ fun SearchBarComponent(query:String,
             unfocusedPlaceholderColor = Color.Black.copy(0.5f),
             focusedPlaceholderColor = Color.Black.copy(0.7f)
         ),
-        shape = RoundedCornerShape(25.dp),
+        shape = RoundedCornerShape(24.dp),
         singleLine = true
     )
 }
@@ -266,15 +350,14 @@ fun HomeHeader() {
     val evening = stringResource(R.string.home_greeting_evening)
     val night = stringResource(R.string.home_greeting_night)
 
-    val greeting = remember {
         val hour = java.util.Calendar.getInstance().get(java.util.Calendar.HOUR_OF_DAY)
-        when (hour) {
-            in 5..11 -> morning
-            in 12..18 -> afternoon
-            in 19..23 -> evening
-            else -> night
-        }
-    }
+        val greeting = when (hour) {
+                in 5..11 -> morning
+                in 12..18 -> afternoon
+                in 19..23 -> evening
+                else -> night
+            }
+
     Text(
         text = greeting,
         style = MaterialTheme.typography.headlineLarge,

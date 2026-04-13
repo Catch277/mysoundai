@@ -1,7 +1,9 @@
 import asyncio
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from typing import List
+
 
 
 # Khởi tạo ứng dụng FastAPI
@@ -10,6 +12,7 @@ app = FastAPI(
     description="API for MySoundAI - cung cấp nhạc theo tâm trạng và sở thích của người dùng",
     version="1.0.0"
 )
+
 
 # Mô hình dữ liệu cho bài hát
 class Song(BaseModel):
@@ -20,6 +23,8 @@ class Song(BaseModel):
     image_url: str
     audio_url: str
 
+        
+
 # Endpoint kiểm tra hệ thống
 @app.get("/health", tags=["Health"])
 def health_check():
@@ -29,30 +34,30 @@ def health_check():
 async def get_recommendations(prompt: str = "tâm trạng vui vẻ"):
     await asyncio.sleep(2)
 
+ 
     return [
         {
             "id": "1",
             "title": "Happy Song",
-            "artist": "Artist A",
-            "duration": 215000,
-            "image_url": "https://example.com/happy_song.jpg",
-            "audio_url": "https://example.com/happy_song.mp3"
+            "artist": "SoundHelix",
+            "duration": 300000,
+            "image_url": "https://i.pinimg.com/736x/ed/ad/58/edad5830245602a18c73a6843b6079ba.jpg",
+            "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3"
         },
         {
             "id": "2",
             "title": "Joyful Tune",
-            "artist": "Artist B",
-            "duration": 215000,
-            "image_url": "https://example.com/joyful_tune.jpg",
-            "audio_url": "https://example.com/joyful_tune.mp3"
+            "artist": "SoundHelix",
+            "duration": 320000,
+            "image_url": "https://picsum.photos/201",
+            "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-2.mp3"
         },
         {
             "id": "3",
             "title": "Upbeat Melody",
-            "artist": "Artist C",
-            "duration": 30000,
-            "image_url": "https://example.com/upbeat_melody.jpg",
-            "audio_url": "https://example.com/upbeat_melody.mp3"
+            "artist": "SoundHelix",
+            "duration": 290000,
+            "image_url": "https://picsum.photos/202",
+            "audio_url": "https://www.soundhelix.com/examples/mp3/SoundHelix-Song-3.mp3"
         }
     ]
-        
