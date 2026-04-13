@@ -45,6 +45,7 @@ import com.example.mysoundai.ui.components.SongGridItem
 import com.example.mysoundai.ui.components.ToastMessage
 import com.example.mysoundai.ui.viewmodel.DownloadUiEvent
 import com.example.mysoundai.ui.viewmodel.DownloadViewModel
+import com.example.mysoundai.ui.viewmodel.LibraryViewModel
 import com.example.mysoundai.ui.viewmodel.PlayerViewModel
 import kotlinx.coroutines.launch
 
@@ -52,6 +53,7 @@ import kotlinx.coroutines.launch
 fun HomeScreen(viewModel: HomeViewModel,
                downloadViewModel: DownloadViewModel,
                playerViewModel: PlayerViewModel,
+               libraryViewModel: LibraryViewModel,
                paddingValues: PaddingValues) {
     val songs = viewModel.songList.value
     val isLoading = viewModel.isLoading.value
@@ -71,6 +73,9 @@ fun HomeScreen(viewModel: HomeViewModel,
     val downloadStates by downloadViewModel.downloadStates.collectAsState()
     val downloadedSongs by downloadViewModel.downloadedSongs.collectAsState()
     val localPathsMap = downloadedSongs.associate { it.songId to it.filePath }
+
+    val favoriteSongs by libraryViewModel.favoriteSongs.collectAsState()
+    val favoriteIds = remember(favoriteSongs) { favoriteSongs.map { it.id }.toSet() }
 
     var toastMessage by remember { mutableStateOf<UiText?>(null) }
     var toastTrigger by remember { mutableIntStateOf(0) }
@@ -166,9 +171,12 @@ fun HomeScreen(viewModel: HomeViewModel,
                         } else {
                             downloadStates[song.id] ?: DownloadState.Idle
                         }
-                        val isDownloaded = state is DownloadState.Completed
                         SongItem(song = song,
                                  state = state,
+                                 isFavorite = favoriteIds.contains(song.id),
+                                 onFavoriteClick = {
+                                     libraryViewModel.toggleFavorite(song, favoriteIds.contains(song.id))
+                                 },
                                  onDownloadClick = {
                                      downloadViewModel.downloadSong(song)
                                  },
@@ -225,11 +233,14 @@ fun HomeScreen(viewModel: HomeViewModel,
                                 } else {
                                     downloadStates[song.id] ?: DownloadState.Idle
                                 }
-                                val isDownloaded = state is DownloadState.Completed
                                 SongGridItem(
                                     modifier = Modifier.weight(1f),
                                     song = song,
                                     state = state,
+                                    isFavorite = favoriteIds.contains(song.id),
+                                    onFavoriteClick = {
+                                        libraryViewModel.toggleFavorite(song, favoriteIds.contains(song.id))
+                                    },
                                     onDownloadClick = {
                                         downloadViewModel.downloadSong(song)
                                     },

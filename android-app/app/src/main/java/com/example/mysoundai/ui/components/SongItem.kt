@@ -20,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.*
@@ -34,6 +36,8 @@ import com.example.mysoundai.domain.model.DownloadState
 @Composable
 fun SongItem(song: Song,
              state: DownloadState = DownloadState.Idle,
+             isFavorite: Boolean = false,
+             onFavoriteClick: () -> Unit,
              onDownloadClick: () -> Unit,
              onCancelClick: () -> Unit = {},
              onItemClick: () -> Unit) {
@@ -45,7 +49,10 @@ fun SongItem(song: Song,
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Row(
-            modifier = Modifier.padding(12.dp),
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth()
+                .clickable { onItemClick() },
             verticalAlignment = Alignment.CenterVertically
         ) {
             AsyncImage(
@@ -63,49 +70,76 @@ fun SongItem(song: Song,
                 Text(text = song.title, style = MaterialTheme.typography.titleMedium)
                 Text(text = song.artist, style = MaterialTheme.typography.titleMedium)
             }
-            when (state) {
-                is DownloadState.Idle -> {
-                    IconButton(onClick = onDownloadClick) {
-                        Icon(Icons.Default.Download, contentDescription = null)
-                    }
-                }
-                is DownloadState.Checking -> {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(24.dp)
+
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                IconButton(onClick = onFavoriteClick, modifier = Modifier.size(36.dp)) {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Default.Favorite else Icons.Default.FavoriteBorder,
+                        contentDescription = "Favorite",
+                        tint = if (isFavorite) Color(0xFF1DB954) else Color.Gray,
+                        modifier = Modifier.size(22.dp)
                     )
                 }
-                is DownloadState.Downloading -> {
-                    Box(contentAlignment = Alignment.Center) {
-                        CircularProgressIndicator(
-                            progress = { state.progress / 100f },
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.primary,
-                            strokeWidth = 2.dp
-                        )
-                        IconButton(
-                            onClick = onCancelClick,
-                            modifier = Modifier.size(24.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Close,
-                                contentDescription = null,
-                                tint = Color.White,
-                                modifier = Modifier.size(14.dp)
+                Box(
+                    modifier = Modifier.size(36.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    when (state) {
+                        is DownloadState.Idle -> {
+                            IconButton(onClick = onDownloadClick) {
+                                Icon(Icons.Default.Download, contentDescription = null)
+                            }
+                        }
+
+                        is DownloadState.Checking -> {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp)
                             )
                         }
-                    }
-                }
-                is DownloadState.Completed -> {
-                    Icon(Icons.Default.Check, contentDescription = null)
-                }
-                is DownloadState.Failed -> {
-                    IconButton(onClick = onDownloadClick) {
-                        Icon(Icons.Default.Refresh, contentDescription = null)
-                    }
-                }
-                is DownloadState.Cancelled -> {
-                    IconButton(onClick = onDownloadClick) {
-                        Icon(Icons.Default.PlayArrow, contentDescription = stringResource(R.string.retry_download))
+
+                        is DownloadState.Downloading -> {
+                            Box(contentAlignment = Alignment.Center) {
+                                CircularProgressIndicator(
+                                    progress = { state.progress / 100f },
+                                    modifier = Modifier.size(24.dp),
+                                    color = MaterialTheme.colorScheme.primary,
+                                    strokeWidth = 2.dp
+                                )
+                                IconButton(
+                                    onClick = onCancelClick,
+                                    modifier = Modifier.size(24.dp)
+                                ) {
+                                    Icon(
+                                        imageVector = Icons.Default.Close,
+                                        contentDescription = null,
+                                        tint = Color.White,
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                }
+                            }
+                        }
+
+                        is DownloadState.Completed -> {
+                            Icon(Icons.Default.Check, contentDescription = null)
+                        }
+
+                        is DownloadState.Failed -> {
+                            IconButton(onClick = onDownloadClick) {
+                                Icon(Icons.Default.Refresh, contentDescription = null)
+                            }
+                        }
+
+                        is DownloadState.Cancelled -> {
+                            IconButton(onClick = onDownloadClick) {
+                                Icon(
+                                    Icons.Default.PlayArrow,
+                                    contentDescription = stringResource(R.string.retry_download)
+                                )
+                            }
+                        }
                     }
                 }
             }

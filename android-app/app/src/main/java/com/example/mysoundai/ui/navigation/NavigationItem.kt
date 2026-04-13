@@ -23,6 +23,7 @@ sealed class Screen(
     object Settings     : Screen("settings",      R.string.nav_settings)
     object UpdateProfile: Screen("updateProfile", R.string.nav_update_profile)
     object Downloads    : Screen("downloads",     R.string.nav_downloads)
+    object PlaylistDetail: Screen("playlistDetail")
 }
 
 val bottomNavItems = listOf(

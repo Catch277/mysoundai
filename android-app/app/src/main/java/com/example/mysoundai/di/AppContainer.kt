@@ -11,8 +11,11 @@ import androidx.core.content.edit
 import androidx.room.Room
 import com.example.mysoundai.data.local.room.AppDatabase
 import com.example.mysoundai.data.repository.DownloadRepository
+import com.example.mysoundai.data.repository.FavoriteRepository
+import com.example.mysoundai.data.repository.PlaylistRepository
 import com.example.mysoundai.service.MusicController
 import okhttp3.OkHttpClient
+import kotlin.getValue
 
 object AppContainer {
     lateinit var themePreference: ThemePreference
@@ -44,6 +47,20 @@ object AppContainer {
         MusicController(ctx)
     }
 
+    val downloadRepository: DownloadRepository by lazy {
+        DownloadRepository(songDao = database.songDao(),
+            context = ctx,
+            okHttpClient = okHttpClient)
+    }
+
+    val favoriteRepository: FavoriteRepository by lazy {
+        FavoriteRepository(favoriteDao = database.favoriteDao())
+    }
+
+    val playlistRepository: PlaylistRepository by lazy {
+        PlaylistRepository(playlistDao = database.playlistDao())
+    }
+
     private val firebaseAuth: FirebaseAuth by lazy {
         FirebaseAuth.getInstance()
     }
@@ -61,11 +78,5 @@ object AppContainer {
         )
             .fallbackToDestructiveMigration(true)
             .build()
-    }
-
-    val downloadRepository: DownloadRepository by lazy {
-        DownloadRepository(songDao = database.songDao(),
-                           context = ctx,
-                           okHttpClient = okHttpClient)
     }
 }

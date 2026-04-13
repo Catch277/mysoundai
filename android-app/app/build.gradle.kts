@@ -41,6 +41,8 @@ android {
 }
 
 dependencies {
+    implementation(libs.androidx.compose.animation.core)
+    implementation(libs.engage.core)
     //Media3 Exoplayer
     val media3Version = "1.10.0" // Phiên bản ổn định mới nhất hiện tại
     implementation("androidx.media3:media3-exoplayer:$media3Version")

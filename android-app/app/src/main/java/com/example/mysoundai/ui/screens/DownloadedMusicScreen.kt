@@ -43,6 +43,7 @@ import com.example.mysoundai.domain.model.DownloadState
 import com.example.mysoundai.ui.components.ToastMessage
 import com.example.mysoundai.ui.viewmodel.DownloadUiEvent
 import com.example.mysoundai.ui.viewmodel.DownloadViewModel
+import com.example.mysoundai.ui.viewmodel.LibraryViewModel
 import com.example.mysoundai.ui.viewmodel.PlayerViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -50,6 +51,7 @@ import com.example.mysoundai.ui.viewmodel.PlayerViewModel
 fun DownloadedMusicScreen(
     viewModel: DownloadViewModel,
     playerViewModel: PlayerViewModel,
+    libraryViewModel: LibraryViewModel,
     onNavigateToExplore: () -> Unit,
     onBack: () -> Unit
 ) {
@@ -60,6 +62,10 @@ fun DownloadedMusicScreen(
     val downloadedSongs by viewModel.downloadedSongs.collectAsState()
     var showSearch by remember { mutableStateOf(false) }
     var searchQuery by remember { mutableStateOf("") }
+
+    val favoriteSongs by libraryViewModel.favoriteSongs.collectAsState()
+    val favoriteIds = remember(favoriteSongs) { favoriteSongs.map { it.id }.toSet() }
+
 
     val filteredSongs = remember(searchQuery, downloadedSongs) {
         if (searchQuery.isEmpty()) downloadedSongs
@@ -267,17 +273,15 @@ fun DownloadedMusicScreen(
                         items(items = filteredSongs, key = { it.songId }) { downloadedSong ->
                             val uiSong = downloadedSong.toDomain()
                             val state = downloadStates[downloadedSong.songId] ?: DownloadState.Completed
-                            val dismissState = rememberSwipeToDismissBoxState(
-                                confirmValueChange = { value ->
-                                    if (value == SwipeToDismissBoxValue.EndToStart) {
-                                        viewModel.deleteDownloadedSong(downloadedSong)
-                                        true
-                                    } else false
-                                }
-                            )
+                            val dismissState = rememberSwipeToDismissBoxState()
+                            LaunchedEffect(dismissState.currentValue) {
+                                if (dismissState.currentValue == SwipeToDismissBoxValue.EndToStart)
+                                    viewModel.deleteDownloadedSong(downloadedSong)
+                            }
                             SwipeToDismissBox(
                                 state = dismissState,
                                 enableDismissFromStartToEnd = false,
+                                enableDismissFromEndToStart = true,
                                 backgroundContent = {
                                     val color = if (dismissState.targetValue == SwipeToDismissBoxValue.EndToStart) {
                                         Color.Red.copy(alpha = 0.8f)
@@ -302,6 +306,10 @@ fun DownloadedMusicScreen(
                                 SongItem(
                                     song = uiSong,
                                     state = state,
+                                    isFavorite = favoriteIds.contains(uiSong.id),
+                                    onFavoriteClick = {
+                                        libraryViewModel.toggleFavorite(uiSong, favoriteIds.contains(uiSong.id))
+                                    },
                                     onDownloadClick = {
                                         viewModel.downloadSong(uiSong)
                                     },
